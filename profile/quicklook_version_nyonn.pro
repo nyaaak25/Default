@@ -21,7 +21,7 @@ for loop=0,count-1 do begin
   file=files(loop)
   restore,file
   ;fileorbit=strmid(file,42,7)
-  ;軌道の名前を書くところ
+  ;軌道の名前を書くところだよ
   fileorbit=strupcase(strmid(file,12,9,/REVERSE_OFFSET))
   
   ;カラーの入れ方
