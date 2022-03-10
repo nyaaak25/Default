@@ -1,8 +1,8 @@
 pro test_quicklook
 
-  restore, '/Users/nyonn/IDLWorkspace/Default/savfile/orb0313_4.sav'
+  restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0006_0.sav'
   ;;specsol_0403:太陽輝度情報
-  openr,2,'/Users/nyonn/IDLWorkspace/Default/'+'specsol_0403.dat'
+  openr,2,'/Users/nyonn/IDLWorkspace/Default/profile/'+'specsol_0403.dat'
   specmars=0B
   ;;spcmarsに入れるOMEGAの波長分
   ;格納する場所：specmars
@@ -116,6 +116,7 @@ pro test_quicklook
   
   ; ========= 他の軌道データについて =============
   
+  timei=reform(geocube(0:6,1,*))
   time=timei(*,yind)
   
   local_time=(longi-sub_solar_longitude)*24/360+12
@@ -136,39 +137,72 @@ pro test_quicklook
   hour=strmid(time(3),10,2)
   minit=strmid(time(4),10,2)
   
+  ; ======== True Color画像 ==============
+  
+  blue=where(wvl gt 0.476 and wvl lt 0.484)
+  red=where(wvl gt 0.645 and wvl lt 0.655)
+  
+  radred=reform(jdat(*,red,*))
+  radblue = jdat(*,blue,*)
+  
+  redimage =  double(radred(ind))
+  
+  maxredimage = max(redimage)
+  minredimage = min(redimage)
+
+  redimage_for_color = double((redimage-minredimage)/(maxredimage-minredimage))*255
+  colorredimage = redimage_for_color
+  
+  yraw=n_elements(jdat(0,0,*))
+  xraw=n_elements(jdat(*,0,0))
+  
+;  radred=radred(*,*,0:round(yraw/10)*10-1)
+;  radred=reform(radred,1,xraw,round(yraw/10)*10)
+;  red_image=rebin(radred,1,64,round(yraw/10))
+  
+  radblue=radblue(*,*,0:round(yraw/10)*10-1)
+  radblue=reform(radblue,1,xraw,round(yraw/10)*10)
+  blue_image=rebin(radblue,1,64,round(yraw/10))
+  
+;  image_mars = red_image + blue_image
   
   ; ========= plotする場所 ================
   
   !p.multi = [0,3,1,0,0]
 
   ; CO2吸収量 mapping
-  plot,longi(ind),lati(ind), xstyle=1,ystyle=1,title='CO2_absorption',xtitle='latitude'$
-    ,color=0,position=[0.05,0.13,0.3,0.92],xticks=2,/nodata, charsize=2
-  ; cgColorbar,Range=[10,10.5],position=[0.01,0.02,0.3,0.03]
-  plots, longi(ind),lati(ind),color=color2,psym=2
+;  plot,longi(ind),lati(ind), xstyle=1,ystyle=1,title='CO2_absorption',xtitle='latitude'$
+;    ,color=0,position=[0.05,0.13,0.3,0.92],xticks=2,/nodata, charsize=2
+;  ; cgColorbar,Range=[10,10.5],position=[0.01,0.02,0.3,0.03]
+;  plots, longi(ind),lati(ind),color=color2,psym=2
+;  
+;  ; 日付と軌道番号
+;  xyouts,0.06,0.975,fileorbit,charsize=1.5,color=0,/normal
+;  xyouts,0.25,0.975,'Time : '+year+'/'+month+'/'+day+' '+hour+':'+minit,color=0,/normal,charsize=1
+;  xyouts,0.45,0.975,'Ls : '+Ls,color=0,/normal,charsize=1
+;  xyouts,0.65,0.975,'Local Time : '+localtime,color=0,/normal,charsize=1
+;  
+;
+;  ; MOLA高度 mapping
+;   plot,longi(ind),lati(ind),xstyle=1,ystyle=1,title='MOLA altitude',xtitle='latitude'$
+;    ,color=0,position=[0.35,0.13,0.6,0.92],xticks=2,/nodata, charsize=2
+;  cgColorbar,Range=[10,10.5],position=[0.2,0.03,0.7,0.04]
+;  plots, longi(ind),lati(ind),color=colorMOLA,psym=2
+;
+;  ; CO2吸収量 - MOLA高度
+;  plot,longi(ind),lati(ind),xstyle=1,ystyle=1,title='CO2 - MOLA altitude',xtitle='latitude'$
+;    ,color=0,position=[0.65,0.13,0.9,0.92],xticks=2,/nodata, charsize=2
+;  ; cgColorbar,Range=[10,10.5],position=[0.65,0.01,0.9,0.03]
+;  plots, longi(ind),lati(ind),color=colordev,psym=2
   
-  ; 日付と軌道番号、
-  xyouts,0.06,0.975,fileorbit,charsize=1.5,color=0,/normal
-  xyouts,0.25,0.975,'Time : '+year+'/'+month+'/'+day+' '+hour+':'+minit,color=0,/normal,charsize=1
-  xyouts,0.45,0.975,'Ls : '+Ls,color=0,/normal,charsize=1
-  xyouts,0.65,0.975,'Local Time : '+localtime,color=0,/normal,charsize=1
   
-
-  ; MOLA高度 mapping
-   plot,longi(ind),lati(ind),xstyle=1,ystyle=1,title='MOLA altitude',xtitle='latitude'$
-    ,color=0,position=[0.35,0.13,0.6,0.92],xticks=2,/nodata, charsize=2
-  cgColorbar,Range=[10,10.5],position=[0.2,0.03,0.7,0.04]
-  plots, longi(ind),lati(ind),color=colorMOLA,psym=2
-
-  ; CO2吸収量 - MOLA高度
-  plot,longi(ind),lati(ind),xstyle=1,ystyle=1,title='CO2 - MOLA altitude',xtitle='latitude'$
-    ,color=0,position=[0.65,0.13,0.9,0.92],xticks=2,/nodata, charsize=2
-  ; cgColorbar,Range=[10,10.5],position=[0.65,0.01,0.9,0.03]
-  plots, longi(ind),lati(ind),color=colordev,psym=2
+  plot, longi(ind),lati(ind),xstyle=1,ystyle=1,title='CO2 - MOLA altitude',xtitle='latitude'$
+      ,color=0,position=[0.65,0.13,0.9,0.92],xticks=2,/nodata, charsize=2
   
+  plots, longi(ind),lati(ind),color=colorredimage,psym=2
   
-  snapshot = TVRD(True=1)
-  Write_JPEG, path_save+fileorbit+'.jpg', snapshot, True=1, Quality=100
+;  snapshot = TVRD(True=1)
+;  Write_JPEG, path_save+fileorbit+'.jpg', snapshot, True=1, Quality=100
  
  stop
 

@@ -5,12 +5,19 @@ pro quicklook_version_nyonn
 ; Created on Mon Mar 7 17:33:00 2022
 
 ;================= restore file and set altitude to use ===========================================
-pathfile = '/Users/nyonn/IDLWorkspace/Default/savfile/'
-path_save='/Users/nyonn/IDLWorkspace/Default/quick_look_jpeg/'
+; Localで回す時
+ pathfile = '/Users/nyonn/IDLWorkspace/Default/savfile/'
+ path_save='/Users/nyonn/IDLWorkspace/Default/quick_look_jpeg/'
+
+; phobosで回す時
+;pathfile = 'sftp://phobos.gp.tohoku.ac.jp:10022/data2/omega/sav/'
+;path_save='sftp://phobos.gp.tohoku.ac.jp:10022/home/nyonnkazama/nyonn/test/Quick-Look/'
+
 files=file_search(pathfile+'*.sav',count=count)
 force=1
 
-for loop=0,count-1 do begin
+; for loop=0,count-1 do begin
+for loop=0,10 do begin
   IF force eq 0 THEN BEGIN
     sdir = FILE_SEARCH(path_save + strupcase(FILE_BASENAME(files(loop),'.sav')),COUNT = tnf)
     IF tnf GT 0L THEN CONTINUE
@@ -33,6 +40,7 @@ for loop=0,count-1 do begin
 
 ; ============== CO2吸収量とMOLA地形の計算を行う ==============================
   openr,2,'/Users/nyonn/IDLWorkspace/Default/profile/'+'specsol_0403.dat'
+;  openr,2,'/sftp://phobos.gp.tohoku.ac.jp:10022/home/nyonnkazama/nyonn/test/IDLcode/profile/'+'specsol_0403.dat'
   specmars = 0B
   ;spcmarsに入れるOMEGAの352波長分
   ;格納する場所：specmars
@@ -137,6 +145,7 @@ for loop=0,count-1 do begin
   
   ; ========= 他の軌道データについて =============
 
+  timei=reform(geocube(0:6,1,*))
   time=timei(*,yind)
 
   local_time=(longi-sub_solar_longitude)*24/360+12
@@ -145,7 +154,8 @@ for loop=0,count-1 do begin
   indLT2=where(local_time ge 24)
   if n_elements(indLT2) gt 1 then local_time(indLT2)=local_time(indLT2)-24
 
-  localtime = mean(local_time)
+  localtime = strmid(mean(local_time),5,8)
+  
 
   ; other parameters
   Ls=strmid(SOLAR_LONGITUDE,5,7)
@@ -170,7 +180,7 @@ for loop=0,count-1 do begin
   xyouts,0.06,0.975,fileorbit,charsize=1.5,color=0,/normal
   xyouts,0.25,0.975,'Time : '+year+'/'+month+'/'+day+' '+hour+':'+minit,color=0,/normal,charsize=1
   xyouts,0.45,0.975,'Ls : '+Ls,color=0,/normal,charsize=1
-  xyouts,0.65,0.975,'Local Time : '+localtime,color=0,/normal,charsize=1
+  xyouts,0.55,0.975,'Local Time : '+localtime,color=0,/normal,charsize=1
 
 
   ; MOLA高度 mapping
