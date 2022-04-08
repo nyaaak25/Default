@@ -1,6 +1,6 @@
 pro test_quicklook
 
-  restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0006_0.sav'
+  restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0006_1.sav'
   ;;specsol_0403:太陽輝度情報
   openr,2,'/Users/nyonn/IDLWorkspace/Default/profile/'+'specsol_0403.dat'
   specmars=0B

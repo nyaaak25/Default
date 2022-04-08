@@ -1,8 +1,8 @@
 pro nadiaspectrum
 
-  restore, '/Users/kazama/IDLWorkspace/orb0278_3.sav'
+  restore, '/Users/nyonn/IDLWorkspace/Default/savfile/orb0278_3.sav'
 ;;specsol_0403:太陽輝度情報
-  openr,2,'/Users/kazama/IDLWorkspace/'+'specsol_0403.dat'
+  openr,2,'/Users/nyonn/IDLWorkspace/Default/profile/'+'specsol_0403.dat'
   specmars=0B
   ;;spcmarsに入れるOMEGAの波長分
   ;格納する場所：specmars
@@ -65,6 +65,12 @@ pro nadiaspectrum
   
   
   
+  
+ plot, co2wvl,flux1, /nodata;,yrange=[0.2,1.2]
+ oplot, co2wvl,flux1, color=1,psym=2
+ ;oplot, x, y, color=230, psym=2
+ 
+  
   ;規格化
   y1=flux(0)
   y2=flux(20)
@@ -123,10 +129,10 @@ sycolor=0
 ;pl2.color="blue"
   
   
-  
-  plot, co2wvl,flux1, /nodata;,yrange=[0.2,1.2]
-  oplot, co2wvl,flux1, color=1,psym=2
-  ;oplot, x, y, color=230, psym=2
+;  
+;  plot, co2wvl,flux1, /nodata;,yrange=[0.2,1.2]
+;  oplot, co2wvl,flux1, color=1,psym=2
+;  ;oplot, x, y, color=230, psym=2
   
   ;snapshot = TVRD(True=1)
   ;Write_JPEG, 'onaji2.jpg', snapshot, true=1
