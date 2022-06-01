@@ -186,7 +186,8 @@ for loop=0,3 do begin
   ; MOLA高度 mapping
   plot,longi(ind),lati(ind),xstyle=1,ystyle=1,title='MOLA altitude',xtitle='latitude'$
     ,color=0,position=[0.35,0.13,0.6,0.92],xticks=2,/nodata, charsize=2
-  Colorbar,Range=[10,10.5],position=[0.2,0.03,0.7,0.04]
+  ;Colorbar,Range=[10,10.5],position=[0.2,0.03,0.7,0.04]
+  Colorbar,position=[0.2,0.03,0.7,0.04]
   plots, longi(ind),lati(ind),color=colorMOLA,psym=2
 
   ; CO2吸収量 - MOLA高度
