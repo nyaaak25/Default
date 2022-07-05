@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------------------------------------------------
-Pro Cal_LUtable_obsspec
+Pro Cal_LUtable_obsspec_ver2
 ; +++
 ; to read outputs from ARS and calculate equivalent width (=absorption depth) for each spectrum
 ; create by Shohei Aoki
@@ -9,30 +9,21 @@ Pro Cal_LUtable_obsspec
 ; cal_lutable_obsspec　 ::2022.6.1 Wed 11:43:00
 ; OMEGAで観測されたスペクトルの吸収深さ量を計算するプログラム
 ; 
+; cal_lutable_obsspec_ver2  ::2022.06.07 Tue 11:10:00
+; I/F -> 放射輝度から吸収量を計算するプログラム
+; 
 ; +++
 ;------------------------------------------------------------------------------------------------------------------------
 
 ; ============ file情報 ==========================
 ; 観測データ
-path = '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0313_4.sav'
+path = '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0931_3.sav'
 restore, path
 
 ; ============== CO2吸収量の計算を行う ==============================
-openr,2,'/Users/nyonn/IDLWorkspace/Default/profile/'+'specsol_0403.dat'
-specmars = 0B
-
-;spcmarsに入れるOMEGAの352波長分
-;格納する場所：specmars
-specmars=fltarr(352)
-readf,2,specmars
-close,2
-
-specmars=specmars/dmars/dmars
 
 ; CO2の吸収帯を持ってくる
 CO2=where(wvl gt 1.81 and wvl lt 2.19)
-
-specmars=specmars[CO2]
 wvl=wvl[CO2]
 
 nwvl=n_elements(wvl)
@@ -42,7 +33,7 @@ flux=dblarr(io,nwvl,ip)
 
 for i=0,io-1 do begin
   for o=0,ip-1 do begin
-    flux(i,*,o)=jdat(i,co2,o)/specmars
+    flux(i,*,o)=jdat(i,co2,o)
   endfor
 endfor
 
@@ -87,7 +78,7 @@ for i=0, 75007 do begin
   obs_spec(i) = total(width[band],/nan)  
 endfor
 
-save,obs_spec,$
-  filename='/Users/nyonn/IDLWorkspace/Default/savfile/Table_SP_obs_calc_orb0313_4.sav'
-stop
+;save,obs_spec,$
+;  filename='/Users/nyonn/IDLWorkspace/Default/savfile/Table_SP_obs_calc_orb0931_3.sav'
+;stop
 END

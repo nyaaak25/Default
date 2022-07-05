@@ -34,7 +34,11 @@ endfor
   endfor
   free_lun,lun
                
-    
+wn = (1/wn)*10000
+wn = reverse(wn)
+band=where(wn gt 1.9 and wn lt 2.1)
+rad0 = reverse(rad0)  
+
 ;Cal equivalent width (absorption depth) by Aoki
 x = [wn(0),wn(3),wn(5),wn(23),wn(24), wn(25)]
 y0 = [rad0(0), rad0(3), rad0(5), rad0(23), rad0(24), rad0(25)]
@@ -46,7 +50,8 @@ coef0 = linfit(X,Y0)
 
 cont0 = coef0(0) + coef0(1)*wn
 y_calc = 1 - rad0/cont0
-y_total = total(y_calc[7:18])
+y_calc[16] = !VALUES.F_NAN
+y_total = total(y_calc[7:18],/nan)
 
 
 cont0 = coef0(0) + coef0(1)*wn(8)  ; 4837.81250 cm-1  1個目の吸収ライン
