@@ -46,22 +46,22 @@ rad13=dblarr(27)
 rad14=dblarr(27)
 rad15=dblarr(27)
 
-x = dblarr(2)
-y1 = dblarr(2)
-y2 = dblarr(2)
-y3 = dblarr(2)
-y4 = dblarr(2)
-y5 = dblarr(2)
-y6 = dblarr(2)
-y7 = dblarr(2)
-y8 = dblarr(2)
-y9 = dblarr(2)
-y10 = dblarr(2)
-y11 = dblarr(2)
-y12 = dblarr(2)
-y13 = dblarr(2)
-y14 = dblarr(2)
-y15 = dblarr(2)
+x = dblarr(6)
+y1 = dblarr(6)
+y2 = dblarr(6)
+y3 = dblarr(6)
+y4 = dblarr(6)
+y5 = dblarr(6)
+y6 = dblarr(6)
+y7 = dblarr(6)
+y8 = dblarr(6)
+y9 = dblarr(6)
+y10 = dblarr(6)
+y11 = dblarr(6)
+y12 = dblarr(6)
+y13 = dblarr(6)
+y14 = dblarr(6)
+y15 = dblarr(6)
 
 for IT1 = 1, 5 do begin
   for IT2 = 1, 3 do begin
@@ -216,84 +216,98 @@ for IT1 = 1, 5 do begin
                   wn(i)=a
                   rad1(i)=b
                 endfor
+                
                 free_lun,lun
-;                openr,lun,file2,/get_lun
-;                for i = 0, 27-1 do begin
-;                  readf,lun,a,b
-;                  rad2(i)=b
-;                endfor
-;                free_lun,lun
+                openr,lun,file2,/get_lun
+                for i = 0, 27-1 do begin
+                  readf,lun,a,b
+                  rad2(i)=b
+                endfor
+                
+                free_lun,lun
                 openr,lun,file3,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad3(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file4,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad4(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file5,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad5(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file6,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad6(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file7,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad7(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file8,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad8(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file9,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad9(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file10,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad10(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file11,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad11(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file12,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad12(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file13,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad13(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file14,/get_lun
                 for i = 0, 27-1 do begin
                   readf,lun,a,b
                   rad14(i)=b
                 endfor
+                
                 free_lun,lun
                 openr,lun,file15,/get_lun
                 for i = 0, 27-1 do begin
@@ -304,7 +318,7 @@ for IT1 = 1, 5 do begin
                 
                 wn = (1/wn)*10000
                 wn = reverse(wn)
-                band=where(wn gt 1.9 and wn lt 2.1)
+                band=where(wn gt 1.89 and wn lt 2.05)
                 
                 rad1 = reverse(rad1)
                 rad2 = reverse(rad2)
