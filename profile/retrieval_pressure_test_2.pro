@@ -40,7 +40,7 @@ if SZA gt 75. then begin
   print,'Warning: SZA > limit'
   goto, skip
 endif
-if EA ge 10. then begin
+if EA gt 10. then begin
   print,'Warning: EA > limit'
   goto, skip
 endif
@@ -48,7 +48,7 @@ if PA gt 180. then begin
   print,'Warning: PA > limit'
   goto, skip
 endif
-if Dust gt 1.2 then begin
+if Dust gt 1.5 then begin
   print,'Warning: DUST > limit'
   goto, skip
 endif
@@ -60,7 +60,7 @@ if Albedo gt 0.5 then begin
   print,'Warning: Albedo > limit'
   goto, skip
 endif
-if Albedo lt 0.1 then begin
+if Albedo lt 0.05 then begin
   print,'Warning: Albedo < limit'
   goto, skip
 endif
@@ -219,14 +219,14 @@ if j5 lt 0 then stop
 if j6 lt 0 then stop
 if j7 lt 0 then stop
 if j8 lt 0 then stop
-if j1+1 ge 4 then stop
+if j1+1 ge 5 then stop
 if j2+1 ge 3 then stop
-if j3+1 ge 5 then stop
+if j3+1 ge 6 then stop
 if j4+1 ge 3 then stop
-if j5+1 ge 4 then stop
-if j6+1 ge 5 then stop
-if j7+1 ge 4 then stop
-if j8+1 ge 5 then stop
+if j5+1 ge 5 then stop
+if j6+1 ge 6 then stop
+if j7+1 ge 3 then stop
+if j8+1 ge 6 then stop
 
 for I = 0, 15-1 do begin
 
@@ -773,13 +773,14 @@ for I = 0, 15-1 do begin
 
 
 endfor
-
 pressure_CD=interpol(Pressure_grid,Y,trans)
-stop
+
 skip:
 
 return, pressure_CD
+
 end
+
 
 Pro retrieval_pressure_test_2
 
@@ -791,22 +792,16 @@ Pro retrieval_pressure_test_2
 ;path
 ;================================================
 path = '/data2/omega/sav/'
+path2 = '/work1/LUT/SP/table/absorption/'
 restore, path + 'specmars.sav'
 
 ;================================================
 ;Loop start
 ;================================================
 for Loop = 0, 2 do begin
-  
   if loop eq 0 then file = path+'ORB0920_3.sav'
   if loop eq 1 then file = path+'ORB0931_3.sav'
   if loop eq 2 then file = path+'ORB0313_4.sav'
-;  if loop eq 3 then file = path+'ORB1023_6.sav'
-;  if loop eq 4 then file = path+'ORB1023_7.sav'
-;  if loop eq 5 then file = path+'ORB0018_4.sav'
-;  if loop eq 6 then file = path+'ORB0024_4.sav'
-;  if loop eq 7 then file = path+'ORB0049_4.sav'
-;  if loop eq 8 then file = path+'ORB0171_3.sav'
 
   restore, file
   ip = n_elements(LATI(*,0))
@@ -920,30 +915,30 @@ for Loop = 0, 2 do begin
 ;      window,loop,xs=1000,ys=800
       !p.multi=[0,2,1]
       
-      min_water = 0;min(trans(*,*),/nan);0.
-      max_water = 0.3;max(trans(*,points),/nan);0.1; max(trans(*,where(flag(points) eq 0)),/nan)*1.1
-      rn_water = max_water - min_water
+      min_pressure = min(trans(*,*),/nan) ;0.
+      max_pressure = max(trans(*,points),/nan) ;0.1; max(trans(*,where(flag(points) eq 0)),/nan)*1.1
+      rn_pressure = max_pressure - min_pressure
       plot,longi(*,*),lati(*,*),xs=1,ys=1,psym=1,back=255,color=0,/nodata,thick=3,ytitle='Latitude',xtitle='Longitude',$
-        title='Water: '+'Ls:'+STRCOMPRESS(Solar_longitude)+' Max: '+string(max_water,format='(f4.2)' ),charsize=2.
+        title='Ls:'+STRCOMPRESS(Solar_longitude)+' Max:'+string(max_pressure,format='(f4.2)' ),charsize=1.
       for i = 0, io-1 do begin
         for j = 0, ip-1 do begin
-          color = (trans(j,i)-min_water)/rn_water*254.
+          color = (trans(j,i)-min_pressure)/rn_pressure*254.
           if color gt 254 then color = 254
           if color lt 0 then color = 0
           plots, longi(j,i),lati(j,i),color=color,psym=6,symsize=0.5,thick=3
         endfor
       endfor
       
-      min_water = 0
-      max_water = 35
-      rn_water = max_water - min_water
+      min_pressure = min(pressure(*,*),/nan)
+      max_pressure = max(pressure(*,points),/nan)
+      rn_pressure = max_pressure - min_pressure
       plot,longi,lati,xs=1,ys=1,psym=1,back=255,color=0,/nodata,thick=3,ytitle='Latitude',xtitle='Longitude',$
-        title='Water: '+'Ls:'+STRCOMPRESS(Solar_longitude)+' Max: '+string(max_water,format='(f4.0)' ),charsize=2.
+        title='Ls:'+STRCOMPRESS(Solar_longitude)+' Max:'+string(max_pressure,format='(f4.0)' ),charsize=1.
       for i = 0, io-1 do begin
         for j = 0, ip-1 do begin
-          color = (water(j,i)-min_water)/rn_water*254.
+          color = (pressure(j,i)-min_pressure)/rn_pressure*254.
           if color gt 254 then color = 254
-          if water(j,i) eq -999 then color = 255
+          if pressure(j,i) eq -999 then color = 255
           if color lt 0 then color = 0
           plots, longi(j,i),lati(j,i),color=color,psym=6,symsize=0.5,thick=3
         endfor
@@ -952,27 +947,16 @@ for Loop = 0, 2 do begin
       !Y.OMargin = [0,0]
       !p.multi=0
       snapshot = TVRD(True=1)
-      Write_JPEG, path+file_basename(file,'.sav')+'_'+STRCOMPRESS(n, /remove_all)+'.jpg', snapshot, True=1, Quality=75
+      Write_JPEG, path2+file_basename(file,'.sav')+'_'+STRCOMPRESS(n, /remove_all)+'.jpg', snapshot, True=1, Quality=75
 
-      if loop eq 0 then file = path+'ORB1023_3.sav'
-      if loop eq 1 then file = path+'ORB1023_4.sav'
-      if loop eq 2 then file = path+'ORB1023_5.sav'
-      if loop eq 3 then file = path+'ORB1023_6.sav'
-      if loop eq 4 then file = path+'ORB1023_7.sav'
-      if loop eq 5 then file = path+'ORB0018_4.sav'
-      if loop eq 6 then file = path+'ORB0024_4.sav'
-      if loop eq 7 then file = path+'ORB0049_4.sav'
-      if loop eq 8 then file = path+'ORB0171_3.sav'
+      if loop eq 0 then file = path+'ORB0920_3.sav'
+      if loop eq 1 then file = path+'ORB0931_3.sav'
+      if loop eq 2 then file = path+'ORB0313_4.sav'
 
-      if loop eq 0 then save,filename='/Users/Shohei/tmp/test_case/work_ORB1023_3.sav',/all
-      if loop eq 1 then save,filename='/Users/Shohei/tmp/test_case/work_ORB1023_4.sav',/all
-      if loop eq 2 then save,filename='/Users/Shohei/tmp/test_case/work_ORB1023_5.sav',/all
-      if loop eq 3 then save,filename='/Users/Shohei/tmp/test_case/work_ORB1023_6.sav',/all
-      if loop eq 4 then save,filename='/Users/Shohei/tmp/test_case/work_ORB1023_7.sav',/all
-      if loop eq 5 then save,filename='/Users/Shohei/tmp/test_case/work_ORB0018_4.sav',/all
-      if loop eq 6 then save,filename='/Users/Shohei/tmp/test_case/work_ORB0024_4.sav',/all
-      if loop eq 7 then save,filename='/Users/Shohei/tmp/test_case/work_ORB0049_4.sav',/all
-      if loop eq 8 then save,filename='/Users/Shohei/tmp/test_case/work_ORB0171_3.sav',/all
+      if loop eq 0 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0920_3.sav',/all
+      if loop eq 1 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0931_3.sav',/all
+      if loop eq 2 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0313_4.sav',/all
+
 endfor
 stop
 end
