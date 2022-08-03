@@ -9,10 +9,8 @@ T1 = TA
 T2 = TB
 
 ;restore
-restore,'/work1/LUT/SP/table/absorption/Table_SP_Trans_calc.sav'
-restore,'/work1/LUT/SP/table/absorption/Table_SP_obs_calc_orb0920_3.sav'
-;restore,'/Users/nyonn/IDLWorkspace/Default/savfile/Table_SP_Trans_calc.sav'
-;restore,'/Users/nyonn/IDLWorkspace/Default/savfile/Table_SP_obs_calc_orb0920_3.sav'
+restore,'/work1/LUT/SP/table/absorption/Table_SP_Trans_calc_ver3.sav'
+;restore,'/work1/LUT/SP/table/absorption/Table_SP_obs_calc_orb0920_3.sav'
 
 ;result
 pressure_CD = -999d
@@ -40,7 +38,7 @@ if SZA gt 75. then begin
   print,'Warning: SZA > limit'
   goto, skip
 endif
-if EA gt 10. then begin
+if EA gt 50. then begin   ; !!TBD
   print,'Warning: EA > limit'
   goto, skip
 endif
@@ -85,10 +83,12 @@ x3a(3) = exp(-cos(45d/180d*!dpi))
 x3a(4) = exp(-cos(60d/180d*!dpi))
 x3a(5) = exp(-cos(75d/180d*!dpi))
 
-x4a = dblarr(3) ; EA
+x4a = dblarr(5) ; EA !!TBD
 x4a(0) = exp(-cos(0d/180d*!dpi))
 x4a(1) = exp(-cos(5d/180d*!dpi))
 x4a(2) = exp(-cos(10d/180d*!dpi))
+x4a(3) = exp(-cos(30d/180d*!dpi))
+x4a(4) = exp(-cos(50d/180d*!dpi))
 
 x5a = dblarr(5) ; PA
 x5a(0) = -cos(0d/180d*!dpi) + 1.d
@@ -167,7 +167,7 @@ for I = 0, 6-1 do begin
 endfor
 skip3:
 
-for I = 0, 3-1 do begin
+for I = 0, 5-1 do begin  ; !!TBD
     F = x4a(I) - X4
     if (F gt 0.0d0) then j4 = I
     if (F gt 0.0d0) then goto, skip4
@@ -771,10 +771,15 @@ for I = 0, 15-1 do begin
         y22222122*t1*t2*t3*t4*t5*(1.d - t6)*t7*t8 +   $
         y22222222*t1*t2*t3*t4*t5*t6*t7*t8
 
+      ;----------------------------------------------------------------------------------
+      bad = where(Table_Equivalent_width(j1:j1+1,j2:j2+1,j3:j3+1,j4:j4+1,j5:j5+1,j6:j6+1,j7:j7+1,j8:j8+1) eq 0, count)
+      if count ge 1 then Y(i) = -0d/0d
+      ;----------------------------------------------------------------------------------
 
 endfor
 pressure_CD=interpol(Pressure_grid,Y,trans)
-
+; print, exp(pressure_CD)
+;stop
 skip:
 
 return, pressure_CD
@@ -798,10 +803,11 @@ restore, path + 'specmars.sav'
 ;================================================
 ;Loop start
 ;================================================
-for Loop = 0, 2 do begin
-  if loop eq 0 then file = path+'ORB0920_3.sav'
-  if loop eq 1 then file = path+'ORB0931_3.sav'
-  if loop eq 2 then file = path+'ORB0313_4.sav'
+for Loop = 0, 1 do begin
+  if loop eq 0 then file = path+'ORB0931_3.sav'
+  if loop eq 1 then file = path+'ORB0030_1.sav'
+  if loop eq 2 then file = path+'ORB0920_3.sav'
+  if loop eq 3 then file = path+'ORB0313_4.sav'
 
   restore, file
   ip = n_elements(LATI(*,0))
@@ -815,9 +821,19 @@ for Loop = 0, 2 do begin
   jdat=jdat(*,CO2,*)
   specmars = specmars(CO2)
   
-  band=where(wvl gt 1.9 and wvl lt 2.1)
+  ; band幅 ver1 → work_***に格納
+  ; band=where(wvl gt 1.85 and wvl lt 2.10)
+
+  ; band幅のupdate ver2  → work2_***.sav fileに格納
+  ; band=where(wvl gt 1.94 and wvl lt 2.09)
+
+  ; band幅のupdatte ver3 → work3_***.sav fileに格納
+  band=where(wvl gt 1.94 and wvl lt 1.99)
+
+  nanserch=where(jdat ge 0 and jdat le 0.0001)
+  jdat(nanserch)=!VALUES.F_NAN
   
-  x = [wvl(0),wvl(3),wvl(5),wvl(23),wvl(24),wvl(25)]
+  x = [wvl(0),wvl(1),wvl(2),wvl(23),wvl(24),wvl(25)]
   
   ;latitude grid
   span_lati = max(lati(0,*)) - min(lati(0,*))
@@ -886,13 +902,10 @@ for Loop = 0, 2 do begin
       ;    print, TB
       ;    ;-----------------
 
-;　ここの書き換えを行う！そして気圧リトリーバル
-; plotの色が引きずられてる？？
-
     for i = 0, count_nscan-1 do begin ;loop for slit scan
       for j = 0, ip-1 do begin  
 
-        Y = [jdat(j,0,points(i)), jdat(j,3,points(i)), jdat(j,5,points(i)), jdat(j,23,points(i)), jdat(j,24,points(i)), jdat(j,25,points(i))]
+        Y = [jdat(j,0,points(i)), jdat(j,1,points(i)), jdat(j,2,points(i)), jdat(j,23,points(i)), jdat(j,24,points(i)), jdat(j,25,points(i))]
         coef = linfit(X,Y)
         cont = coef(0) + coef(1)*wvl
 
@@ -902,9 +915,90 @@ for Loop = 0, 2 do begin
         
         Albedo_input = jdat(j,0,points(i))/specmars(0) / cos(geocube(j,8,points(i))*1e-4*!DTOR)
         width = 1.0 - jdat(j,*,points(i))/cont
-        trans(j,points(i)) = (total(width[band], /nan))-1
+        trans(j,points(i)) = (total(width[band], /nan))
         pressure(j,points(i)) = ret_pressure(trans(j,points(i)), TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input)
-
+        ; print, exp(pressure(j,points(i)))
+        
+        ;for debug ---->
+;        cont_omega = cont
+;        band_omega = band
+;        path = '/work1/LUT/SP/table/output/'
+;        file1 = path + 'SP11' + '_TA' + STRCOMPRESS(fix(2),/REMOVE_AL) $
+;          + '_TB' + STRCOMPRESS(fix(1+1),/REMOVE_AL) $
+;          + '_SZA' + STRCOMPRESS(fix(3+1),/REMOVE_AL) $
+;          + '_EA' + STRCOMPRESS(fix(1+1),/REMOVE_AL) $
+;          + '_PA' + STRCOMPRESS(fix(1+1),/REMOVE_AL) $
+;          + '_Dust' + STRCOMPRESS(fix(0+1),/REMOVE_AL) $
+;          + '_WaterI' + STRCOMPRESS(fix(0+1),/REMOVE_AL) $
+;          + '_SurfaceA' + STRCOMPRESS(fix(2+1),/REMOVE_AL) + '_rad.dat'
+;
+;        file2 = path + 'SP13' + '_TA' + STRCOMPRESS(fix(2),/REMOVE_AL) $
+;          + '_TB' + STRCOMPRESS(fix(1+1),/REMOVE_AL) $
+;          + '_SZA' + STRCOMPRESS(fix(3+1),/REMOVE_AL) $
+;          + '_EA' + STRCOMPRESS(fix(1+1),/REMOVE_AL) $
+;          + '_PA' + STRCOMPRESS(fix(1+1),/REMOVE_AL) $
+;          + '_Dust' + STRCOMPRESS(fix(0+1),/REMOVE_AL) $
+;          + '_WaterI' + STRCOMPRESS(fix(0+1),/REMOVE_AL) $
+;          + '_SurfaceA' + STRCOMPRESS(fix(2+1),/REMOVE_AL) + '_rad.dat'
+;
+;        wn=dblarr(27)
+;        rad1=dblarr(27)
+;        rad2=dblarr(27)
+;
+;        ;read files
+;        openr,lun,file1,/get_lun
+;        for i0 = 0, 27-1 do begin
+;          readf,lun,a,b
+;          wn(i0)=a
+;          rad1(i0)=b
+;        endfor
+;        openr,lun,file2,/get_lun
+;        for i0 = 0, 27-1 do begin
+;          readf,lun,a,b
+;          wn(i0)=a
+;          rad2(i0)=b
+;        endfor
+;
+;        wn = (1/wn)*1d4
+;        wn = reverse(wn)
+;        rad1 = reverse(rad1)
+;        rad2 = reverse(rad2)
+;        x = [wn(0), wn(1), wn(2), wn(23), wn(24), wn(25)]
+;        y1 = [rad1(0), rad1(1), rad1(2), rad1(23), rad1(24), rad1(25)]
+;        y2 = [rad2(0), rad2(1), rad2(2), rad2(23), rad2(24), rad2(25)]
+;        coef1 = linfit(X,Y1)
+;        coef2 = linfit(X,Y2)
+;        cont1 = coef1(0) + coef1(1)*wn
+;        cont2 = coef2(0) + coef2(1)*wn
+;
+;        Set_Plot, 'x'
+;        loadct, 39
+;        device, retain=1, decomposed=0
+;        window,0,xs=1000,ys=800
+;        plot, wvl, jdat(j,*,points(i))/cont_omega, thick=3
+;        oplot, wn, rad1/cont1, color=254, thick=3
+;        oplot, wn, rad2/cont2, color=200, thick=3
+;;        oplot, wvl, 1-width, color=150, thick=3
+;
+;        width1 = 1.0 - rad1/cont1
+;        width1[16] = !VALUES.F_NAN
+;
+;        width2 = 1.0 - rad2/cont2
+;        width2[16] = !VALUES.F_NAN
+;
+;        window,1,xs=1000,ys=800
+;        plot, wvl, width, thick=3
+;        oplot, wn, width1, color=254, thick=3
+;        oplot, wn, width2, color=200, thick=3
+;
+;        band=where(wn gt 1.85 and wn lt 2.10)
+;        v1 = total(width1[band],/nan)
+;        v2 = total(width2[band],/nan)
+;        v = total(width[band],/nan)
+;        print, v, v1, v2
+;        stop
+;<----- for debug        
+        
       endfor
     endfor
   endfor
@@ -952,13 +1046,15 @@ for Loop = 0, 2 do begin
       snapshot = TVRD(True=1)
       Write_JPEG, path2+file_basename(file,'.sav')+'_'+STRCOMPRESS(n, /remove_all)+'.jpg', snapshot, True=1, Quality=75
 
-      if loop eq 0 then file = path+'ORB0920_3.sav'
-      if loop eq 1 then file = path+'ORB0931_3.sav'
-      if loop eq 2 then file = path+'ORB0313_4.sav'
+      if loop eq 0 then file = path+'ORB0931_3.sav'
+      if loop eq 1 then file = path+'ORB0030_1.sav'
+      if loop eq 2 then file = path+'ORB0920_3.sav'
+      if loop eq 3 then file = path+'ORB0313_4.sav'
 
-      if loop eq 0 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0920_3.sav',/all
-      if loop eq 1 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0931_3.sav',/all
-      if loop eq 2 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0313_4.sav',/all
+      if loop eq 0 then save,filename='/work1/LUT/SP/table/absorption/work2_2_ORB0931_3.sav',/all
+      if loop eq 1 then save,filename='/work1/LUT/SP/table/absorption/work2_2_ORB0030_1.sav',/all
+      if loop eq 2 then save,filename='/work1/LUT/SP/table/absorption/work3_ORB0920_3.sav',/all
+      if loop eq 3 then save,filename='/work1/LUT/SP/table/absorption/work3_ORB0313_4.sav',/all
 
 endfor
 stop
