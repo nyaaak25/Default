@@ -11,6 +11,8 @@ T2 = TB
 ;restore
 restore,'/work1/LUT/SP/table/absorption/Table_SP_Trans_calc.sav'
 restore,'/work1/LUT/SP/table/absorption/Table_SP_obs_calc_orb0920_3.sav'
+;restore,'/work1/LUT/SP/table/absorption/Table_SP_obs_calc_orb0931_3.sav'
+;restore,'/work1/LUT/SP/table/absorption/Table_SP_obs_calc_orb0313_4.sav'
 ;restore,'/Users/nyonn/IDLWorkspace/Default/savfile/Table_SP_Trans_calc.sav'
 ;restore,'/Users/nyonn/IDLWorkspace/Default/savfile/Table_SP_obs_calc_orb0920_3.sav'
 
@@ -798,12 +800,13 @@ restore, path + 'specmars.sav'
 ;================================================
 ;Loop start
 ;================================================
-for Loop = 0, 2 do begin
+for Loop = 0, 1 do begin
   if loop eq 0 then file = path+'ORB0920_3.sav'
   if loop eq 1 then file = path+'ORB0931_3.sav'
   if loop eq 2 then file = path+'ORB0313_4.sav'
 
   restore, file
+  
   ip = n_elements(LATI(*,0))
   io = n_elements(LATI(0,*))
     
@@ -812,13 +815,8 @@ for Loop = 0, 2 do begin
   
   CO2=where(wvl gt 1.81 and wvl lt 2.19)
   wvl=wvl[CO2]
-  jdat=jdat(*,CO2,*)
   specmars = specmars(CO2)
-  
-  band=where(wvl gt 1.9 and wvl lt 2.1)
-  
-  x = [wvl(0),wvl(3),wvl(5),wvl(23),wvl(24),wvl(25)]
-  
+    
   ;latitude grid
   span_lati = max(lati(0,*)) - min(lati(0,*))
   nlay_span = ceil(span_lati/1.875)
@@ -889,17 +887,12 @@ for Loop = 0, 2 do begin
     for i = 0, count_nscan-1 do begin ;loop for slit scan
       for j = 0, ip-1 do begin  
 
-        Y = [jdat(j,0,points(i)), jdat(j,3,points(i)), jdat(j,5,points(i)), jdat(j,23,points(i)), jdat(j,24,points(i)), jdat(j,25,points(i))]
-        coef = linfit(X,Y)
-        cont = coef(0) + coef(1)*wvl
-
         SZA = reform(geocube(j,8,points(i)))*1.e-4
         EA = reform(geocube(j,9,points(i)))*1.e-4
         PA = reform(geocube(j,10,points(i)))*1.e-4
         
         Albedo_input = jdat(j,0,points(i))/specmars(0) / cos(geocube(j,8,points(i))*1e-4*!DTOR)
-        width = 1.0 - jdat(j,*,points(i))/cont
-        trans(j,points(i)) = (total(width[band], /nan))-1
+        trans(j,points(i)) = obs_spec
         pressure(j,points(i)) = ret_pressure(trans(j,points(i)), TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input)
 
       endfor
@@ -951,11 +944,11 @@ for Loop = 0, 2 do begin
 
       if loop eq 0 then file = path+'ORB0920_3.sav'
       if loop eq 1 then file = path+'ORB0931_3.sav'
-      if loop eq 2 then file = path+'ORB0313_4.sav'
+      ; if loop eq 2 then file = path+'ORB0313_4.sav'
 
       if loop eq 0 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0920_3.sav',/all
       if loop eq 1 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0931_3.sav',/all
-      if loop eq 2 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0313_4.sav',/all
+      ; if loop eq 2 then save,filename='/work1/LUT/SP/table/absorption/work_ORB0313_4.sav',/all
 
 endfor
 stop

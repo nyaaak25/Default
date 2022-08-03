@@ -38,7 +38,7 @@ ip=n_elements(jdat(1,1,*))
 obs_spec = reform(jdat(*,0,*))
 
 ; CO2の吸収線の中
-band=where(wvl gt 1.89 and wvl lt 2.05)
+band=where(wvl gt 1.85 and wvl lt 2.10)
 
 ;OMEGAの38番目と48番目の素子が死んでた
 nanserch=where(jdat ge 0 and jdat le 0.0001)
@@ -48,8 +48,8 @@ jdat = jdat(*,CO2,*)
 
 for i=0, io-1 do begin
   for j=0, ip-1 do begin
-    x = [wvl(0),wvl(3),wvl(5),wvl(23),wvl(24),wvl(25)]
-    y = [jdat(i,0,j), jdat(i,3,j), jdat(i,5,j), jdat(i,23,j), jdat(i,24,j), jdat(i,25,j)]
+    x = [wvl(0),wvl(1),wvl(2),wvl(23),wvl(24),wvl(25)]
+    y = [jdat(i,0,j), jdat(i,1,j), jdat(i,2,j), jdat(i,23,j), jdat(i,24,j), jdat(i,25,j)]
     coef = linfit(x,y)
     cont = coef(0) + coef(1)*wvl
     width = 1- jdat(i,*,j)/cont

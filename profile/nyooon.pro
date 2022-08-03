@@ -3,6 +3,22 @@ Pro nyooon
 ; IDLの思考整理.pro file
 ; 試したいことを色々試せるfile
 
+
+for ISZA = 1, 2 do begin ;4) SZA
+  if ISZA eq 1 then SZA = 00.0
+  if ISZA eq 2 then SZA = 15.0
+  
+  for IPA = 2,2 do begin ;6) Phase angle
+    if IPA eq 1 then PA = 00.0
+    if IPA eq 2 then PA = 45.0
+    if IPA eq 3 then PA = 90.0
+      
+      print, SZA + PA
+      
+  endfor
+endfor
+
+
 ;wn=dblarr(27)
 ;rad1=dblarr(27)
 ;
@@ -29,7 +45,7 @@ Pro nyooon
 ;y_calc = total(width1[band])
 
 
-path =  '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0313_4.sav'
+path =  '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0920_3.sav'
 restore, path
 
 ; ARSで計算した場所の波長帯を取ってきている
@@ -41,10 +57,13 @@ nwvl=n_elements(wvl)
 io=n_elements(jdat(*,1,1))
 ip=n_elements(jdat(1,1,*))
 
+ip_1 = n_elements(LATI(*,0))
+io_1 = n_elements(LATI(0,*))
+
 obs_spec = reform(jdat(*,0,*))
 
 ; CO2の吸収線の中
-band=where(wvl gt 1.89 and wvl lt 2.05)
+band=where(wvl gt 1.94 and wvl lt 2.09)
 
 ;OMEGAの38番目と48番目の素子が死んでた
 nanserch=where(jdat ge 0 and jdat le 0.0001)
@@ -57,16 +76,19 @@ for i=0, io-1 do begin
   for j=0, ip-1 do begin
 ;for i=0, 2 do begin
 ;  for j=0, 2 do begin
-    x = [wvl(0),wvl(3),wvl(5),wvl(23),wvl(24),wvl(25)]
-    y = [jdat(i,0,j), jdat(i,3,j), jdat(i,5,j), jdat(i,23,j), jdat(i,24,j), jdat(i,25,j)]
+    x = [wvl(0),wvl(1),wvl(2),wvl(23),wvl(24),wvl(25)]
+    y = [jdat(i,0,j), jdat(i,1,j), jdat(i,2,j), jdat(i,23,j), jdat(i,24,j), jdat(i,25,j)]
     coef = linfit(x,y)
     cont = coef(0) + coef(1)*wvl
     width = 1- jdat(i,*,j)/cont
+    
+    SZA = reform(geocube(i,8,j))*1.e-4
+    EA = reform(geocube(i,9,j))*1.e-4
+    PA = reform(geocube(i,10,j))*1.e-4
   
     obs_spec(i,j) = total(width[*,band],/nan)
   endfor
 endfor
-
 
 ;x = [wvl(0),wvl(3),wvl(5),wvl(23),wvl(24),wvl(25)]
 ;y = [jdat(0,0,0), jdat(0,3,0), jdat(0,5,0), jdat(0,23,0), jdat(0,24,0), jdat(0,25,0)]

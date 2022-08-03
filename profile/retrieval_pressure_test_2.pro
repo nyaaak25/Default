@@ -886,6 +886,9 @@ for Loop = 0, 2 do begin
       ;    print, TB
       ;    ;-----------------
 
+;　ここの書き換えを行う！そして気圧リトリーバル
+; plotの色が引きずられてる？？
+
     for i = 0, count_nscan-1 do begin ;loop for slit scan
       for j = 0, ip-1 do begin  
 
