@@ -1,5 +1,6 @@
 
 ; pathをphobos用に直さなければいけない (sav fileとMCD用のpath)
+; warningのあとに値を出力
 
 ;------------------------------------------------------------------------------------------------------------------------
 function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
@@ -38,7 +39,7 @@ if SZA gt 75. then begin
   print,'Warning: SZA > limit'
   goto, skip
 endif
-if EA gt 50. then begin   ; !!TBD
+if EA gt 50. then begin 
   print,'Warning: EA > limit'
   goto, skip
 endif
@@ -83,7 +84,7 @@ x3a(3) = exp(-cos(45d/180d*!dpi))
 x3a(4) = exp(-cos(60d/180d*!dpi))
 x3a(5) = exp(-cos(75d/180d*!dpi))
 
-x4a = dblarr(5) ; EA !!TBD
+x4a = dblarr(5) ; EA
 x4a(0) = exp(-cos(0d/180d*!dpi))
 x4a(1) = exp(-cos(5d/180d*!dpi))
 x4a(2) = exp(-cos(10d/180d*!dpi))
@@ -222,7 +223,7 @@ if j8 lt 0 then stop
 if j1+1 ge 5 then stop
 if j2+1 ge 3 then stop
 if j3+1 ge 6 then stop
-if j4+1 ge 3 then stop
+if j4+1 ge 5 then stop
 if j5+1 ge 5 then stop
 if j6+1 ge 6 then stop
 if j7+1 ge 3 then stop
@@ -776,12 +777,24 @@ for I = 0, 15-1 do begin
       if count ge 1 then Y(i) = -0d/0d
       ;----------------------------------------------------------------------------------
 
-endfor
-pressure_CD=interpol(Pressure_grid,Y,trans)
-; print, exp(pressure_CD)
-;stop
-skip:
+  print, y
 
+endfor
+
+; print, 'before_0', Pressure_grid ;debug 20220804
+; print, 'before_1', Y ;debug 20220804
+; print, 'before_2', trans ;debug 20220804
+
+pressure_CD=interpol(Pressure_grid,Y,trans)
+
+if pressure_CD eq 0 then print, 'after_0', Pressure_grid ;debug 20220804
+if pressure_CD eq 0 then print, 'after_1', Y ;debug 20220804
+if pressure_CD eq 0 then print, 'after_2', trans ;debug 20220804
+; print, exp(pressure_CD) ;debug 20220804
+if pressure_CD eq 0 then stop ;debug 20220804
+
+; limitが、かかったらここに飛ばす
+skip:
 return, pressure_CD
 
 end
@@ -798,18 +811,18 @@ Pro retrieval_pressure_test_2
 ;================================================
 path = '/data2/omega/sav/'
 path2 = '/work1/LUT/SP/table/absorption/'
-restore, path + 'specmars.sav'
-
 ;================================================
 ;Loop start
 ;================================================
-for Loop = 0, 1 do begin
+; 引数で書いても良いかもしれない
+
+for Loop = 0, 3 do begin
   if loop eq 0 then file = path+'ORB0931_3.sav'
   if loop eq 1 then file = path+'ORB0030_1.sav'
   if loop eq 2 then file = path+'ORB0920_3.sav'
   if loop eq 3 then file = path+'ORB0313_4.sav'
-
   restore, file
+
   ip = n_elements(LATI(*,0))
   io = n_elements(LATI(0,*))
     
@@ -819,6 +832,8 @@ for Loop = 0, 1 do begin
   CO2=where(wvl gt 1.81 and wvl lt 2.19)
   wvl=wvl[CO2]
   jdat=jdat(*,CO2,*)
+
+  restore, path + 'specmars.sav'
   specmars = specmars(CO2)
   
   ; band幅 ver1 → work_***に格納
@@ -913,11 +928,14 @@ for Loop = 0, 1 do begin
         EA = reform(geocube(j,9,points(i)))*1.e-4
         PA = reform(geocube(j,10,points(i)))*1.e-4
         
+        ; reflectance factor ( I/F / cos(SZA) )
         Albedo_input = jdat(j,0,points(i))/specmars(0) / cos(geocube(j,8,points(i))*1e-4*!DTOR)
+        if Albedo_input gt 0.5 then print,Albedo_input ;debug 20220804
+
         width = 1.0 - jdat(j,*,points(i))/cont
         trans(j,points(i)) = (total(width[band], /nan))
         pressure(j,points(i)) = ret_pressure(trans(j,points(i)), TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input)
-        ; print, exp(pressure(j,points(i)))
+        if loop eq 1 then print, loop,n,i,j ,pressure(j,points(i)) ;debug 20220804
         
         ;for debug ---->
 ;        cont_omega = cont

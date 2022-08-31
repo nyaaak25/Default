@@ -1,16 +1,6 @@
-;------------------------------------------------------------------------------------------------------------------------
-Pro Cal_LUtable_ver2_nyonn
-; +++
-; to read outputs from ARS and calculate equivalent width (=absorption depth) for each spectrum
-; create by Shohei Aoki
-; 
-; edit by Akira Kazama
-; 
-; cal_lutable_ver2_nyonn　 ::2022.6.1 Wed 10:49:00
-; ver2: 吸収の深さ量を計算するプログラム
-; 
-; +++
-;------------------------------------------------------------------------------------------------------------------------
+Pro retrieval_pressure_fitting_test
+; 必要なものだけを取り出す
+;observation OMEGA data path
 path1 = '/work1/LUT/SP/table/output_SP1/'
 path2 = '/work1/LUT/SP/table/output_SP2/'
 path3 = '/work1/LUT/SP/table/output_SP3/'
@@ -333,15 +323,6 @@ for IT1 = 1, 5 do begin
                 wn = (1/wn)*10000
                 wn = reverse(wn)
 
-                ; ver1
-                band=where(wn gt 1.85 and wn lt 2.10)
-                
-                ; ver2
-                ; band=where(wn gt 1.94 and wn lt 2.09)
-
-                ; ver3
-                ; band=where(wn gt 1.94 and wn lt 1.99)
-                
                 rad1 = reverse(rad1)
                 rad2 = reverse(rad2)
                 rad3 = reverse(rad3)
@@ -393,63 +374,63 @@ for IT1 = 1, 5 do begin
                 coef15 = linfit(X,Y15)
                 
                 cont1 = coef1(0) + coef1(1)*wn
-                width1 = 1.0 - rad1/cont1
+                width1 = rad1/cont1
                 width1[16] = !VALUES.F_NAN
                                 
                 cont2 = coef2(0) + coef2(1)*wn
-                width2 = 1.0 - rad2/cont2
+                width2 = rad2/cont2
                 width2[16] = !VALUES.F_NAN
                 
                 cont3 = coef3(0) + coef3(1)*wn
-                width3 = 1.0 - rad3/cont3
+                width3 = rad3/cont3
                 width3[16] = !VALUES.F_NAN
                 
                 cont4 = coef4(0) + coef4(1)*wn
-                width4 = 1.0 - rad4/cont4
+                width4 = rad4/cont4
                 width4[16] = !VALUES.F_NAN
                 
                 cont5 = coef5(0) + coef5(1)*wn
-                width5 = 1.0 - rad5/cont5
+                width5 = rad5/cont5
                 width5[16] = !VALUES.F_NAN
                 
                 cont6 = coef6(0) + coef6(1)*wn
-                width6 = 1.0 - rad6/cont6
+                width6 = rad6/cont6
                 width6[16] = !VALUES.F_NAN
                 
                 cont7 = coef7(0) + coef7(1)*wn
-                width7 = 1.0 - rad7/cont7
+                width7 = rad7/cont7
                 width7[16] = !VALUES.F_NAN
                 
                 cont8 = coef8(0) + coef8(1)*wn
-                width8 = 1.0 - rad8/cont8
+                width8 = rad8/cont8
                 width8[16] = !VALUES.F_NAN
                 
                 cont9 = coef9(0) + coef9(1)*wn
-                width9 = 1.0 - rad9/cont9
+                width9 = rad9/cont9
                 width9[16] = !VALUES.F_NAN
                 
                 cont10 = coef10(0) + coef10(1)*wn
-                width10 = 1.0 - rad10/cont10
+                width10 = rad10/cont10
                 width10[16] = !VALUES.F_NAN
                 
                 cont11 = coef11(0) + coef11(1)*wn
-                width11 = 1.0 - rad11/cont11
+                width11 = rad11/cont11
                 width11[16] = !VALUES.F_NAN
                 
                 cont12 = coef12(0) + coef12(1)*wn
-                width12 = 1.0 - rad12/cont12
+                width12 = rad12/cont12
                 width12[16] = !VALUES.F_NAN
                 
                 cont13 = coef13(0) + coef13(1)*wn
-                width13 = 1.0 - rad13/cont13
+                width13 = rad13/cont13
                 width13[16] = !VALUES.F_NAN
                 
                 cont14 = coef14(0) + coef14(1)*wn
-                width14 = 1.0 - rad14/cont14
+                width14 = rad14/cont14
                 width14[16] = !VALUES.F_NAN
                 
                 cont15 = coef15(0) + coef15(1)*wn
-                width15 = 1.0 - rad15/cont15
+                width15 = rad15/cont15
                 width15[16] = !VALUES.F_NAN
 
 
@@ -458,23 +439,22 @@ for IT1 = 1, 5 do begin
 ;                plot, wn, rad7 / (coef7(0) + coef7(1)*wn), xs=1, ys=1
 ;                stop
 
-                Table_Equivalent_pressure1(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width1[band],/nan)
-                Table_Equivalent_pressure2(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width2[band],/nan)
-                Table_Equivalent_pressure3(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width3[band],/nan)
-                Table_Equivalent_pressure4(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width4[band],/nan)
-                Table_Equivalent_pressure5(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width5[band],/nan)
-                Table_Equivalent_pressure6(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width6[band],/nan)
-                Table_Equivalent_pressure7(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width7[band],/nan)
-                Table_Equivalent_pressure8(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width8[band],/nan)
-                Table_Equivalent_pressure9(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width9[band],/nan)
-                Table_Equivalent_pressure10(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width10[band],/nan)
-                Table_Equivalent_pressure11(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width11[band],/nan)
-                Table_Equivalent_pressure12(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width12[band],/nan)
-                Table_Equivalent_pressure13(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width13[band],/nan)
-                Table_Equivalent_pressure14(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width14[band],/nan)
-                Table_Equivalent_pressure15(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = total(width15[band],/nan)
+                Table_Equivalent_pressure1(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width1
+                Table_Equivalent_pressure2(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width2
+                Table_Equivalent_pressure3(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width3
+                Table_Equivalent_pressure4(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width4
+                Table_Equivalent_pressure5(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width5
+                Table_Equivalent_pressure6(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width6
+                Table_Equivalent_pressure7(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width7
+                Table_Equivalent_pressure8(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width8
+                Table_Equivalent_pressure9(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width9
+                Table_Equivalent_pressure10(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width10
+                Table_Equivalent_pressure11(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width11
+                Table_Equivalent_pressure12(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width12
+                Table_Equivalent_pressure13(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width13
+                Table_Equivalent_pressure14(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width14
+                Table_Equivalent_pressure15(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width15
 
-                if y1(0) ge 100 then stop
               endfor
             endfor
           endfor
@@ -484,22 +464,4 @@ for IT1 = 1, 5 do begin
   endfor
 endfor
 
-save,Table_Equivalent_pressure1,$
-     Table_Equivalent_pressure2,$
-     Table_Equivalent_pressure3,$
-     Table_Equivalent_pressure4,$
-     Table_Equivalent_pressure5,$
-     Table_Equivalent_pressure6,$
-     Table_Equivalent_pressure7,$
-     Table_Equivalent_pressure8,$
-     Table_Equivalent_pressure9,$
-     Table_Equivalent_pressure10,$
-     Table_Equivalent_pressure11,$
-     Table_Equivalent_pressure12,$
-     Table_Equivalent_pressure13,$
-     Table_Equivalent_pressure14,$
-     Table_Equivalent_pressure15,$
-     
-     filename='/work1/LUT/SP/table/absorption/Table_SP_calc_ver1_add_albedo.sav'
-stop
-END
+end

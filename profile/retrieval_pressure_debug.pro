@@ -53,7 +53,7 @@ function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
     print,'Warning: ICE > limit'
     goto, skip
   endif
-  if Albedo gt 0.5 then begin
+  if Albedo gt 0.6 then begin
     print,'Warning: Albedo > limit'
     goto, skip
   endif
@@ -82,7 +82,7 @@ function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
   x3a(4) = exp(-cos(60d/180d*!dpi))
   x3a(5) = exp(-cos(75d/180d*!dpi))
 
-  x4a = dblarr(5) ; EA !!TBD
+  x4a = dblarr(5) ; EA 
   x4a(0) = exp(-cos(0d/180d*!dpi))
   x4a(1) = exp(-cos(5d/180d*!dpi))
   x4a(2) = exp(-cos(10d/180d*!dpi))
@@ -109,13 +109,14 @@ function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
   x7a(1) = 0.5d
   x7a(2) = 1.0d
 
-  x8a = dblarr(6) ; Surface Albedo
+  x8a = dblarr(7) ; Surface Albedo
   x8a(0) = 0.05d
   x8a(1) = 0.1d
   x8a(2) = 0.2d
   x8a(3) = 0.3d
   x8a(4) = 0.4d
   x8a(5) = 0.5d
+  x8a(6) = 0.6d
 
   ;Surface pressure grid
   Pressure_grid = dblarr(15)
@@ -194,7 +195,7 @@ function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
   endfor
   skip7:
 
-  for I = 0, 6-1 do begin
+  for I = 0, 7-1 do begin
     F = x8a(I) - X8
     if (F gt 0.0d0) then j8 = I
     if (F gt 0.0d0) then goto, skip8
@@ -221,11 +222,14 @@ function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
   if j1+1 ge 5 then stop
   if j2+1 ge 3 then stop
   if j3+1 ge 6 then stop
-  if j4+1 ge 3 then stop
+  if j4+1 ge 5 then stop
   if j5+1 ge 5 then stop
   if j6+1 ge 6 then stop
   if j7+1 ge 3 then stop
   if j8+1 ge 6 then stop
+
+  print, j1,j2,j3,j4,j5,j6,j7,j8
+  stop
 
   for I = 0, 15-1 do begin
 
@@ -800,14 +804,15 @@ Pro retrieval_pressure_debug
   ;================================================
   path = '/data2/omega/sav/'
   path2 = '/work1/LUT/SP/table/absorption/'
-  restore, path + 'specmars.sav'
+  ; restore, path + 'specmars.sav'
 
   ;================================================
   ;Loop start
   ;================================================
-  for Loop = 0, 1 do begin
+  for Loop = 0, 2 do begin
     if loop eq 0 then file = path+'ORB0931_3.sav'
     if loop eq 1 then file = path+'ORB0030_1.sav'
+    if loop eq 2 then file = path+'ORB0920_3.sav'
 
     restore, file
     ip = n_elements(LATI(*,0))
@@ -816,10 +821,13 @@ Pro retrieval_pressure_debug
     trans = reform(jdat(*,0,*))
     pressure = trans
 
+    restore, path + 'specmars.sav'
+    
     CO2=where(wvl gt 1.81 and wvl lt 2.19)
     wvl=wvl[CO2]
     jdat=jdat(*,CO2,*)
     specmars = specmars(CO2)
+    print, specmars
 
     ; band幅 ver1 → work_***に格納
     ; band=where(wvl gt 1.85 and wvl lt 2.10)
@@ -901,8 +909,8 @@ Pro retrieval_pressure_debug
       TB = temp
       ;    ;-----------------
 
-      for i = 0, count_nscan-1 do begin ;loop for slit scan
-        for j = 0, ip-1 do begin
+      for i = 0, 1 do begin ;loop for slit scan
+        for j = 0, 1 do begin
 
           Y = [jdat(j,0,points(i)), jdat(j,1,points(i)), jdat(j,2,points(i)), jdat(j,23,points(i)), jdat(j,24,points(i)), jdat(j,25,points(i))]
           coef = linfit(X,Y)
@@ -913,12 +921,12 @@ Pro retrieval_pressure_debug
           PA = reform(geocube(j,10,points(i)))*1.e-4
 
           Albedo_input = jdat(j,0,points(i))/specmars(0) / cos(geocube(j,8,points(i))*1e-4*!DTOR)
-          if Albedo_input gt 0.5 then print,Albedo_input ;debug 20220804
-          
+          ; print, 'specmars:', specmars(0)
+
           width = 1.0 - jdat(j,*,points(i))/cont
           trans(j,points(i)) = (total(width[band], /nan))
           pressure(j,points(i)) = ret_pressure(trans(j,points(i)), TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input)
-          if loop eq 1 then print, loop,n,i,j ,pressure(j,points(i)) ;debug 20220804
+          ; if loop eq 1 then print, loop,n,i,j ,pressure(j,points(i)) ;debug 20220804
           ; print, exp(pressure(j,points(i)))
 
         endfor
@@ -927,9 +935,11 @@ Pro retrieval_pressure_debug
 
     if loop eq 0 then file = path+'ORB0931_3.sav'
     if loop eq 1 then file = path+'ORB0030_1.sav'
+    if loop eq 2 then file = path+'ORB0920_3.sav'
 
     if loop eq 0 then save,filename='/work1/LUT/SP/table/absorption/work2_2_ORB0931_3.sav',/all
     if loop eq 1 then save,filename='/work1/LUT/SP/table/absorption/work2_2_ORB0030_1.sav',/all
+    if loop eq 2 then save,filename='/work1/LUT/SP/table/absorption/work2_2_ORB0920_3.sav',/all
 
   endfor
   stop
