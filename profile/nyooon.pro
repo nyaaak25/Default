@@ -3,22 +3,185 @@ Pro nyooon
 ; IDLの思考整理.pro file
 ; 試したいことを色々試せるfile
 
+; Densityで振ってみることを試してみる
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0030_1.sav'
+ind=where_xyz(longi ge 60.79 and longi le 60.81 and lati ge -48.44 and lati le -48.43,xind=xind,yind=yind)
+; ind=32015, lati: 48.431797 S, longi: 60.808998 E [Forget+, retrievalすると1036 Pa]
 
-for ISZA = 1, 2 do begin ;4) SZA
-  if ISZA eq 1 then SZA = 00.0
-  if ISZA eq 2 then SZA = 15.0
-  
-  for IPA = 2,2 do begin ;6) Phase angle
-    if IPA eq 1 then PA = 00.0
-    if IPA eq 2 then PA = 45.0
-    if IPA eq 3 then PA = 90.0
-      
-      print, SZA + PA
-      
+openr,2,'/Users/nyonn/IDLWorkspace/Default/profile/specsol_0403.dat'
+specmars=0B
+;;spcmarsに入れるOMEGAの波長分
+;格納する場所：specmars
+specmars=fltarr(352)
+readf,2,specmars
+close,2
+specmars = specmars/dmars/dmars
+
+wvl_ind = where(wvl gt 1.85 and wvl lt 2.2)
+wvl=wvl(wvl_ind)
+specmars = specmars(wvl_ind)
+
+io=n_elements(jdat(*,1,1))
+ip=n_elements(jdat(1,1,*))
+nwvl=n_elements(wvl)
+
+flux=dblarr(io,nwvl,ip)
+for i=0,io-1 do begin
+  for o=0,ip-1 do begin
+    flux(i,*,o)=jdat(i,wvl_ind,o)/specmars
   endfor
 endfor
 
+radiance=dblarr(n_elements(ind),nwvl)
+for i=0,nwvl-1 do begin
+  newflux=reform(flux(*,i,*))
+  radiance(*,i)=double(newflux(ind))
+endfor
 
+nanserch=where(radiance ge -1 and radiance le 0.0001)
+radiance(nanserch)=!VALUES.F_NAN
+
+plot, wvl, radiance,xstyle=1
+
+
+
+; curve fittingを試す！
+path1 = '/Users/nyonn/IDLWorkspace/Default/LUT/SP1_TA1_TB1_SZA1_EA1_PA1_Dust1_WaterI1_SurfaceA1_rad.dat'
+path2 = '/Users/nyonn/IDLWorkspace/Default/LUT/SP1_TA1_TB1_SZA1_EA3_PA1_Dust5_WaterI2_SurfaceA6_rad.dat'
+
+wn=dblarr(27)
+rad1=dblarr(27)
+rad2=dblarr(27)
+
+
+;read files
+openr,lun,path1,/get_lun
+for i = 0, 27-1 do begin
+  readf,lun,a,b
+  wn(i)=a
+  rad1(i)=b
+endfor
+free_lun,lun
+
+openr,lun,path2,/get_lun
+for i = 0, 27-1 do begin
+  readf,lun,a,b
+  rad2(i)=b
+endfor
+free_lun,lun
+
+wn = (1/wn)*10000
+wn = reverse(wn)
+
+rad1 = reverse(rad1)
+rad2 = reverse(rad2)
+
+
+stop
+
+; ここのモデル部分を気圧のパラメータを振れば変わるものを入れれたら良い。
+; 圧力の関数にすれば良いから、、P=index_0のときはrad0 → 多次元補間されたものを入れればいい
+expr = rad2
+result = mpfitexpr(expr, wn, rad1,rad2)
+
+stop
+
+; nスキャンは何個？？
+;restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0030_1.sav'
+;openr,2,'/Users/nyonn/IDLWorkspace/Default/profile/specsol_0403.dat'
+;specmars=0B
+;specmars=fltarr(352)
+;readf,2,specmars
+;close,2
+;
+;specmars = specmars/dmars/dmars
+;
+;CO2=where(wvl gt 1.81 and wvl lt 2.19)
+;wvl=wvl[CO2]
+;jdat=jdat(*,CO2,*)
+;specmars = specmars(CO2)
+;
+;span_lati = max(lati(0,*)) - min(lati(0,*))
+;nlay_span = ceil(span_lati/1.875)
+;ip = n_elements(LATI(*,0))
+;
+;for n = 0, 1 do begin
+;  points = where(lati(0,*) ge min(lati(0,*)) + float(n)*1.875 and lati(0,*) lt min(lati(0,*)) + float(n+1)*1.875, count)
+;  count_nscan = count
+;  
+;  for i = 0, 5 do begin ;loop for slit scan
+;    for j = 0, 10 do begin
+;      Albedo_input = jdat(j,0,points(i))/ specmars(0) / cos(geocube(j,8,points(i))*1e-4*!DTOR)
+;      print,n,i,j
+;      print,'Albedo:', Albedo_input
+;      print, 'specmars:', specmars(0)
+;      print, 'cos:', cos(geocube(j,8,points(i))*1e-4*!DTOR)
+;    endfor
+;  endfor
+;endfor
+;
+
+;; 水和鉱物がある場所のスペクトルを見たい！
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0232_0.sav'
+;;specsol_0403:太陽輝度情報
+openr,2,'/Users/nyonn/IDLWorkspace/Default/profile/specsol_0403.dat'
+specmars=0B
+;;spcmarsに入れるOMEGAの波長分
+;格納する場所：specmars
+specmars=fltarr(352)
+readf,2,specmars
+close,2
+
+specmars = specmars/dmars/dmars
+Ls=strmid(SOLAR_LONGITUDE,5,7)
+
+wvl_ind = where(wvl gt 1.0 and wvl lt 2.6)
+wvl=wvl(wvl_ind)
+specmars = specmars(wvl_ind)
+
+io=n_elements(jdat(*,1,1))
+ip=n_elements(jdat(1,1,*))
+nwvl=n_elements(wvl)
+
+flux=dblarr(io,nwvl,ip)
+for i=0,io-1 do begin
+  for o=0,ip-1 do begin
+    flux(i,*,o)=jdat(i,wvl_ind,o)/specmars
+  endfor
+endfor
+
+; 大シルチス台地
+ind=where_xyz(longi ge 68.7 and longi le 69.3 and lati ge 7.8 and lati le 8.4,xind=xind,yind=yind)
+radiance=dblarr(n_elements(ind),nwvl)
+
+for i=0,nwvl-1 do begin
+  newflux=reform(flux(*,i,*))
+  radiance(*,i)=double(newflux(ind))
+endfor
+
+nanserch=where(radiance ge 0 and radiance le 0.0001)
+radiance(nanserch)=!VALUES.F_NAN
+
+plot, wvl, radiance,xrange=[1.1,2.7],xstyle=1
+; plot, wvl, radiance,yrange=[0.13,0.19]
+
+; for文を回さない
+;for ISZA = 1, 2 do begin ;4) SZA
+;  if ISZA eq 1 then SZA = 00.0
+;  if ISZA eq 2 then SZA = 15.0
+;  
+;  for IPA = 2,2 do begin ;6) Phase angle
+;    if IPA eq 1 then PA = 00.0
+;    if IPA eq 2 then PA = 45.0
+;    if IPA eq 3 then PA = 90.0
+;      
+;      print, SZA + PA
+;      
+;  endfor
+;endfor
+
+
+; 吸収
 ;wn=dblarr(27)
 ;rad1=dblarr(27)
 ;
