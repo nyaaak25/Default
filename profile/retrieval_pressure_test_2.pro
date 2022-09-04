@@ -10,7 +10,7 @@ T1 = TA
 T2 = TB
 
 ;restore
-restore,'/work1/LUT/SP/table/absorption/Table_SP_Trans_calc_ver3.sav'
+restore,'/work1/LUT/SP/table/absorption/density/Table_SP_Trans_calc_ver3.sav'
 ;restore,'/work1/LUT/SP/table/absorption/Table_SP_obs_calc_orb0920_3.sav'
 
 ;result

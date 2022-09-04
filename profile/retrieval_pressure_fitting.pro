@@ -288,6 +288,7 @@ end
 Pro retrieval_pressure_fitting
 ; 必要なものだけを取り出す
 ;observation OMEGA data path
+
 path = '/data2/omega/sav/'
 path_output = '/work1/LUT/SP/table/absorption/'
 
