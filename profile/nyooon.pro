@@ -3,10 +3,26 @@ Pro nyooon
 ; IDLの思考整理.pro file
 ; 試したいことを色々試せるfile
 
+; Lsとind場所を知りたいときに使うコード
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0363_0.sav'
+Ls=strmid(SOLAR_LONGITUDE,5,7)
+
 ; Densityで振ってみることを試してみる
 restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0030_1.sav'
 ind=where_xyz(longi ge 60.79 and longi le 60.81 and lati ge -48.44 and lati le -48.43,xind=xind,yind=yind)
 ; ind=32015, lati: 48.431797 S, longi: 60.808998 E [Forget+, retrievalすると1036 Pa]
+; 
+; restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0363_3.sav'
+; ind=where_xyz(longi ge 311.73 and longi le 311.78 and lati ge 22.7 and lati le 22.72,xind=xind,yind=yind)
+; ind=76094,xind=62, yind=594, lati:22.705700 N , longi:311.76300 E (48.237 W)  [Forget+, retrievalすると852 Pa]
+
+; restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB1201_3.sav'
+; ind=where_xyz(longi ge 24.979 and longi le 24.981 and lati ge -7.765 and lati le -7.763,xind=xind,yind=yind)
+; ind=37135, xind=15, yind=1160, lati:7.764°S, longi:24.980°E　[Forget+, retrievalすると470 Pa]
+
+; restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0931_3.sav'
+; ind=where_xyz(longi ge 276.50 and longi le 276.51 and lati ge 51.05 and lati le 51.1,xind=xind,yind=yind)
+; ind = 68287, xind=63, yind=533, lati:51.068897 N, longi:276.50281 E, 青木さんの結果を再現
 
 openr,2,'/Users/nyonn/IDLWorkspace/Default/profile/specsol_0403.dat'
 specmars=0B
