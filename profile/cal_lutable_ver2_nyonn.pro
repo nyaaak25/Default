@@ -334,13 +334,16 @@ for IT1 = 1, 5 do begin
                 wn = reverse(wn)
 
                 ; ver1
-                band=where(wn gt 1.85 and wn lt 2.10)
+                ; band=where(wn gt 1.85 and wn lt 2.10)
                 
                 ; ver2
                 ; band=where(wn gt 1.94 and wn lt 2.09)
 
                 ; ver3
                 ; band=where(wn gt 1.94 and wn lt 1.99)
+
+                ; ver4
+                band = where(wn gt 1.93 and wn lt 2.04)
                 
                 rad1 = reverse(rad1)
                 rad2 = reverse(rad2)
@@ -500,6 +503,6 @@ save,Table_Equivalent_pressure1,$
      Table_Equivalent_pressure14,$
      Table_Equivalent_pressure15,$
      
-     filename='/work1/LUT/SP/table/absorption/Table_SP_calc_ver1_add_albedo.sav'
+     filename='/work1/LUT/SP/table/absorption/Table_SP_calc_ver4_add_albedo.sav'
 stop
 END
