@@ -1,6 +1,7 @@
 
 ; pathをphobos用に直さなければいけない (sav fileとMCD用のpath)
 ; warningのあとに値を出力
+; colum計算で気圧導出に使えるプログラム
 
 ;------------------------------------------------------------------------------------------------------------------------
 function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
