@@ -1,5 +1,17 @@
 Pro nyooon
 
+aa = [1,2,3]
+
+for i =0, 3 do begin
+  if i eq 0 then I1 = aa + 1
+  if i eq 1 then I2 = aa+ 2
+  if i eq 3 then I3 = aa +3
+endfor
+total_I = I1+I2+I3
+print, I1
+print, I2
+print, total_I
+
 ; IDLの思考整理.pro file
 ; 試したいことを色々試せるfile
 
