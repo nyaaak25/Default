@@ -1,3 +1,5 @@
+; まずは1点で波長3個分とかでLMS計算を行ってみる
+
 function LMS_calc, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo, wave, Intensity
 
 T1 = TA 
@@ -783,7 +785,7 @@ LMS1 = dblarr(15)
   endfor
    ; print, "y:" ,y
 
-  LMS = (y - Intensity)^2
+  LMS = y ;(y - Intensity)^2
 
 ; endfor
 
@@ -928,11 +930,17 @@ for wave = 0,26 do begin
 
 endfor
 
-total_LMS = LMS0 + LMS1 + LMS2 + LMS3 + LMS4 + LMS5 + LMS6 + LMS7 + LMS8 + LMS9 + LMS10 + LMS11 + LMS12 + LMS13 + LMS14 + LMS15  + LMS17 + LMS18 + LMS19 + LMS20 + LMS21 + LMS22 + LMS23 + LMS24 + LMS25 + LMS26
+; total_LMS = LMS0 + LMS1 + LMS2 + LMS3 + LMS4 + LMS5 + LMS6 + LMS7 + LMS8 + LMS9 + LMS10 + LMS11 + LMS12 + LMS13 + LMS14 + LMS15  + LMS17 + LMS18 + LMS19 + LMS20 + LMS21 + LMS22 + LMS23 + LMS24 + LMS25 + LMS26
+total_LMS_1 = LMS0
+total_LMS_2 = LMS26
+total_LMS_3 = LMS23
+total_LMS_4 = LMS24
+total_LMS_5 = LMS25
+
 
 ; print, "LMS0:", LMS0(0)
-print, "LMS26:", LMS26(0)
-print, "total:", total_LMS
+; print, "LMS26:", LMS26(0)
+; print, "total:", total_LMS
 
 ;Surface pressure grid
 Pressure_grid = dblarr(15)
@@ -954,7 +962,50 @@ Pressure_grid(14) = alog(1500d)
 
 ; xinterpolに極小値を計算させたものを入れたら気圧が導出できる
 ; *** TBD! ***
-; pressure = interpol(Pressure_grid,total_LMS,xinterpol)
+pressure1 = interpol(Pressure_grid,total_LMS_1,Intensity[0])
+pressure2 = interpol(Pressure_grid,total_LMS_2,Intensity[26])
+pressure3 = interpol(Pressure_grid,total_LMS_3,Intensity[23])
+pressure4 = interpol(Pressure_grid,total_LMS_4,Intensity[24])
+pressure5 = interpol(Pressure_grid,total_LMS_5,Intensity[25])
 
+print, "pressure1:", exp(pressure1)
+print, "pressure2:", exp(pressure2)
+print, "pressure3:", exp(pressure3)
+print, "pressure4:", exp(pressure4)
+print, "pressure5:", exp(pressure5)
+
+; ORB0363_3でチェック中 retrievalすると852 Pa
+; wn(0):5.9526977e-228      
+; wn(1):6.0212888e+92
+; wn(2):0.0000000
+; wn(3):0.0000000
+; wn(4):22033.758
+; wn(5):2239.2206
+; wn(6):89674.872      
+; wn(7):7.3313055e+11
+; wn(8):5.6501814e+13
+; wn(9):1858.5543
+; wn(10):1027.2930
+; wn(11):1217.2015      
+; wn(12):8661.1304
+; wn(13):1326.0085
+; wn(14):1078.4356
+; wn(15):1380.4640
+; wn(16):NaN   
+; wn(17):1359.7269
+; wn(18):1156.3858
+; wn(19):1411.8142
+; wn(20):2294.0319
+; wn(21):4820.2817 
+; wn(22):5.5723976e+10
+; wn(23):265.76018
+; wn(24):6.5631814e-13
+; wn(25):1.8564746e-06
+; wn(26):NaN
+
+; 明日やること (9/29)
+; 波数⇔波長変換について考える。放射輝度のとこの計算で効く。変換しないといけん。
+; そこからMKSに変えて、I/Fで比較をする
+; fitting routineで困っているところをslack共有、ポンチ図作成
  
 end
