@@ -1,23 +1,23 @@
 Pro nyooon
 
-aa = [1,2,3]
-
-for i =0, 3 do begin
-  if i eq 0 then I1 = aa + 1
-  if i eq 1 then I2 = aa+ 2
-  if i eq 3 then I3 = aa +3
-endfor
-total_I = I1+I2+I3
-print, I1
-print, I2
-print, total_I
+;aa = [1,2,3]
+;
+;for i =0, 3 do begin
+;  if i eq 0 then I1 = aa + 1
+;  if i eq 1 then I2 = aa+ 2
+;  if i eq 3 then I3 = aa +3
+;endfor
+;total_I = I1+I2+I3
+;print, I1
+;print, I2
+;print, total_I
 
 ; IDLの思考整理.pro file
 ; 試したいことを色々試せるfile
 
 ; Lsとind場所を知りたいときに使うコード
-restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0363_0.sav'
-Ls=strmid(SOLAR_LONGITUDE,5,7)
+;restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0363_0.sav'
+;Ls=strmid(SOLAR_LONGITUDE,5,7)
 
 ; Densityで振ってみることを試してみる
 restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0030_1.sav'
@@ -45,7 +45,7 @@ readf,2,specmars
 close,2
 specmars = specmars/dmars/dmars
 
-wvl_ind = where(wvl gt 1.85 and wvl lt 2.2)
+wvl_ind = where(wvl gt 0.35 and wvl lt 1.0)
 wvl=wvl(wvl_ind)
 specmars = specmars(wvl_ind)
 
