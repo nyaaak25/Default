@@ -331,24 +331,54 @@ for w = 0, 27-1 do begin
                   endfor
                   free_lun,lun
                   
-                  wn = (1/wn)*10000
                   wn = reverse(wn)
+                  wav = 1/wn
+                  wn = (1/wn)*10000
                   
                   rad1 = reverse(rad1)
+                  rad1 = (rad1/wav^2)*1e-7  ; 波数から波長換算 (erg = 10-7W, cm^2 = 10-4m^2, μm = 10^4cm)
+
                   rad2 = reverse(rad2)
+                  rad2 = (rad2/wav^2)*1e-7
+
                   rad3 = reverse(rad3)
+                  rad3 = (rad3/wav^2)*1e-7
+
                   rad4 = reverse(rad4)
+                  rad4 = (rad4/wav^2)*1e-7
+
                   rad5 = reverse(rad5)
+                  rad5 = (rad5/wav^2)*1e-7
+
                   rad6 = reverse(rad6)
+                  rad6 = (rad6/wav^2)*1e-7
+
                   rad7 = reverse(rad7)
+                  rad7 = (rad7/wav^2)*1e-7
+
                   rad8 = reverse(rad8)
+                  rad8 = (rad8/wav^2)*1e-7
+
                   rad9 = reverse(rad9)
+                  rad9 = (rad9/wav^2)*1e-7
+
                   rad10 = reverse(rad10)
+                  rad10 = (rad10/wav^2)*1e-7
+
                   rad11 = reverse(rad11)
+                  rad11 = (rad11/wav^2)*1e-7
+
                   rad12 = reverse(rad12)
+                  rad12 = (rad12/wav^2)*1e-7
+
                   rad13 = reverse(rad13)
+                  rad13 = (rad13/wav^2)*1e-7
+
                   rad14 = reverse(rad14)
+                  rad14 = (rad14/wav^2)*1e-7
+
                   rad15 = reverse(rad15)
+                  rad15 = (rad15/wav^2)*1e-7
                   
                   ;Cal equivalent width (absorption depth)
                   x = [wn(0), wn(1), wn(2), wn(23), wn(24), wn(25)]
@@ -450,21 +480,21 @@ for w = 0, 27-1 do begin
   ;                plot, wn, rad7 / (coef7(0) + coef7(1)*wn), xs=1, ys=1
   ;                stop
   
-                  Table_Equivalent_pressure1(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width1[w]
-                  Table_Equivalent_pressure2(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width2[w]
-                  Table_Equivalent_pressure3(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width3[w]
-                  Table_Equivalent_pressure4(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width4[w]
-                  Table_Equivalent_pressure5(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width5[w]
-                  Table_Equivalent_pressure6(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width6[w]
-                  Table_Equivalent_pressure7(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width7[w]
-                  Table_Equivalent_pressure8(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width8[w]
-                  Table_Equivalent_pressure9(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width9[w]
-                  Table_Equivalent_pressure10(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width10[w]
-                  Table_Equivalent_pressure11(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width11[w]
-                  Table_Equivalent_pressure12(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width12[w]
-                  Table_Equivalent_pressure13(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width13[w]
-                  Table_Equivalent_pressure14(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width14[w]
-                  Table_Equivalent_pressure15(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = width15[w]
+                  Table_Equivalent_pressure1(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad1[w]
+                  Table_Equivalent_pressure2(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad2[w]
+                  Table_Equivalent_pressure3(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad3[w]
+                  Table_Equivalent_pressure4(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad4[w]
+                  Table_Equivalent_pressure5(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad5[w]
+                  Table_Equivalent_pressure6(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad6[w]
+                  Table_Equivalent_pressure7(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad7[w]
+                  Table_Equivalent_pressure8(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad8[w]
+                  Table_Equivalent_pressure9(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad9[w]
+                  Table_Equivalent_pressure10(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad10[w]
+                  Table_Equivalent_pressure11(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad11[w]
+                  Table_Equivalent_pressure12(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad12[w]
+                  Table_Equivalent_pressure13(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad13[w]
+                  Table_Equivalent_pressure14(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad14[w]
+                  Table_Equivalent_pressure15(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad15[w]
   
                 endfor
               endfor
@@ -491,7 +521,7 @@ for w = 0, 27-1 do begin
        Table_Equivalent_pressure14,$
        Table_Equivalent_pressure15,$
        
-       filename='/work1/LUT/SP/table/LUT_fitting/Table_calc_wave'+ STRCOMPRESS(fix(w),/REMOVE_AL) + '.sav'
+       filename='/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_rad'+ STRCOMPRESS(fix(w),/REMOVE_AL) + '.sav'
        
 endfor
 END
