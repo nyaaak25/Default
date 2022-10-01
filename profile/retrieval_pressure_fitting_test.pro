@@ -6,8 +6,6 @@ T1 = TA
 T2 = TB
 
 LMS = dblarr(15)
-LMS0 = dblarr(15)
-LMS1 = dblarr(15)
 
 ; for wave = 0,1 do begin
 ;restore ARS calc data
@@ -785,7 +783,7 @@ LMS1 = dblarr(15)
   endfor
    ; print, "y:" ,y
 
-  LMS = y ;(y - Intensity)^2
+  LMS = (y - Intensity)^2
 
 ; endfor
 
@@ -930,13 +928,25 @@ for wave = 0,26 do begin
 
 endfor
 
+; (1) 最小二乗和を計算する
 ; total_LMS = LMS0 + LMS1 + LMS2 + LMS3 + LMS4 + LMS5 + LMS6 + LMS7 + LMS8 + LMS9 + LMS10 + LMS11 + LMS12 + LMS13 + LMS14 + LMS15  + LMS17 + LMS18 + LMS19 + LMS20 + LMS21 + LMS22 + LMS23 + LMS24 + LMS25 + LMS26
-total_LMS_1 = LMS0
-total_LMS_2 = LMS26
-total_LMS_3 = LMS23
-total_LMS_4 = LMS24
-total_LMS_5 = LMS25
+total_LMS = LMS9 + LMS10 + LMS11 + LMS12 + LMS13 + LMS14 + LMS15
 
+; (2) 最小二乗和の中で最小値を探す
+min_LMS = min(total_LMS)
+min_ind = (where(total_LMS eq min_LMS)) + 5
+
+print, "total_LMS", total_LMS
+print, "total_min", min_LMS
+print, "min_ind", min_ind
+help, total_LMS
+
+; debug →→
+; total_LMS_1 = LMS0
+; total_LMS_2 = LMS26
+; total_LMS_3 = LMS23
+; total_LMS_4 = LMS24
+; total_LMS_5 = LMS25
 
 ; print, "LMS0:", LMS0(0)
 ; print, "LMS26:", LMS26(0)
@@ -960,19 +970,63 @@ Pressure_grid(12) = alog(1096d)
 Pressure_grid(13) = alog(1300d)
 Pressure_grid(14) = alog(1500d)
 
-; xinterpolに極小値を計算させたものを入れたら気圧が導出できる
-; *** TBD! ***
-pressure1 = interpol(Pressure_grid,total_LMS_1,Intensity[0])
-pressure2 = interpol(Pressure_grid,total_LMS_2,Intensity[26])
-pressure3 = interpol(Pressure_grid,total_LMS_3,Intensity[23])
-pressure4 = interpol(Pressure_grid,total_LMS_4,Intensity[24])
-pressure5 = interpol(Pressure_grid,total_LMS_5,Intensity[25])
+; (3) 極小値を探す
+; 最小二乗和の中で最小値を持つindex前後の値を持ってきて、その中間地点での値を出す
+before_pres = (Pressure_grid(min_ind - 1) + Pressure_grid(min_ind))/2
+after_pres = (Pressure_grid(min_ind + 1) + Pressure_grid(min_ind))/2
 
-print, "pressure1:", exp(pressure1)
-print, "pressure2:", exp(pressure2)
-print, "pressure3:", exp(pressure3)
-print, "pressure4:", exp(pressure4)
-print, "pressure5:", exp(pressure5)
+print, "before_pres", exp(before_pres)
+print, "after_pres", exp(after_pres)
+
+; 最小値からどっちが最小二乗和が小さいかを判断する
+before_interpol = interpol(total_LMS, Pressure_grid, before_pres)
+after_interpol = interpol(total_LMS, Pressure_grid, after_pres)
+
+print, "before:", before_interpol
+print, "after:", after_interpol
+
+result_compare = before_interpol < after_interpol
+
+print, "result:", result_compare
+
+if before_interpol eq result_compare then begin
+  loop_ind_1 = (Pressure_grid(min_ind - 1) + before_pres)/2
+  loop_ind_2 = (Pressure_grid(min_ind) + before_pres)/2
+
+  print, "loop1:", loop_ind_1
+  print, "loop2:", loop_ind_2
+
+  before_interpol = interpol(total_LMS, Pressure_grid, loop_ind_1)
+  after_interpol = interpol(total_LMS, Pressure_grid, loop_ind_2)
+
+  result_compare = before_interpol < after_interpol
+  print, "loop_result:", result_compare
+endif
+
+if after_interpol eq result_compare then begin
+  loop_ind_1 = (Pressure_grid(min_ind + 1) + after_pres)/2
+  loop_ind_2 = (Pressure_grid(min_ind) + after_pres)/2
+
+  print, "loop1:", loop_ind_1
+  print, "loop2:", loop_ind_2
+
+  before_interpol = interpol(total_LMS, Pressure_grid, loop_ind_1)
+  after_interpol = interpol(total_LMS, Pressure_grid, loop_ind_2)
+
+  result_compare = before_interpol < after_interpol
+  print, "loop_result:", result_compare
+endif
+
+
+
+
+
+; *** TBD! ***
+; pressure1 = interpol(Pressure_grid,total_LMS_1,Intensity[0])
+; pressure2 = interpol(Pressure_grid,total_LMS_2,Intensity[26])
+; pressure3 = interpol(Pressure_grid,total_LMS_3,Intensity[23])
+; pressure4 = interpol(Pressure_grid,total_LMS_4,Intensity[24])
+; pressure5 = interpol(Pressure_grid,total_LMS_5,Intensity[25])
 
 ; ORB0363_3でチェック中 retrievalすると852 Pa
 ; wn(0):5.9526977e-228      
@@ -1004,7 +1058,6 @@ print, "pressure5:", exp(pressure5)
 ; wn(26):NaN
 
 ; 明日やること (9/29)
-; 波数⇔波長変換について考える。放射輝度のとこの計算で効く。変換しないといけん。
 ; そこからMKSに変えて、I/Fで比較をする
 ; fitting routineで困っているところをslack共有、ポンチ図作成
  
