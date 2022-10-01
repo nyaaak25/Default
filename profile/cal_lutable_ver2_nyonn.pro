@@ -330,11 +330,12 @@ for IT1 = 1, 5 do begin
                 endfor
                 free_lun,lun
                 
-                wn = (1/wn)*10000
                 wn = reverse(wn)
+                wav = 1/wn
+                wn = (1/wn)*10000
 
                 ; ver1
-                ; band=where(wn gt 1.85 and wn lt 2.10)
+                band=where(wn gt 1.85 and wn lt 2.10)
                 
                 ; ver2
                 ; band=where(wn gt 1.94 and wn lt 2.09)
@@ -343,23 +344,53 @@ for IT1 = 1, 5 do begin
                 ; band=where(wn gt 1.94 and wn lt 1.99)
 
                 ; ver4
-                band = where(wn gt 1.93 and wn lt 2.04)
+                ; band = where(wn gt 1.93 and wn lt 2.04)
                 
+
                 rad1 = reverse(rad1)
+                rad1 = (rad1/wav^2)*1e-7  ; 波数から波長換算 (erg = 10-7W, cm^2 = 10-4m^2, μm = 10^4 cm)
+
                 rad2 = reverse(rad2)
+                rad2 = (rad2/wav^2)*1e-7
+
                 rad3 = reverse(rad3)
+                rad3 = (rad3/wav^2)*1e-7
+
                 rad4 = reverse(rad4)
+                rad4 = (rad4/wav^2)*1e-7
+
                 rad5 = reverse(rad5)
+                rad5 = (rad5/wav^2)*1e-7
+
                 rad6 = reverse(rad6)
+                rad6 = (rad6/wav^2)*1e-7
+
                 rad7 = reverse(rad7)
+                rad7 = (rad7/wav^2)*1e-7
+
                 rad8 = reverse(rad8)
+                rad8 = (rad8/wav^2)*1e-7
+
                 rad9 = reverse(rad9)
+                rad9 = (rad9/wav^2)*1e-7
+
                 rad10 = reverse(rad10)
+                rad10 = (rad10/wav^2)*1e-7
+
                 rad11 = reverse(rad11)
+                rad11 = (rad11/wav^2)*1e-7
+
                 rad12 = reverse(rad12)
+                rad12 = (rad12/wav^2)*1e-7
+
                 rad13 = reverse(rad13)
+                rad13 = (rad13/wav^2)*1e-7
+
                 rad14 = reverse(rad14)
+                rad14 = (rad14/wav^2)*1e-7
+
                 rad15 = reverse(rad15)
+                rad15 = (rad15/wav^2)*1e-7
                 
                 ;Cal equivalent width (absorption depth)
                 x = [wn(0), wn(1), wn(2), wn(23), wn(24), wn(25)]
@@ -503,6 +534,6 @@ save,Table_Equivalent_pressure1,$
      Table_Equivalent_pressure14,$
      Table_Equivalent_pressure15,$
      
-     filename='/work1/LUT/SP/table/absorption/Table_SP_calc_ver4_add_albedo.sav'
+     filename='/work1/LUT/SP/table/absorption/density/Table_SP_calc_ver1_update.sav'
 stop
 END
