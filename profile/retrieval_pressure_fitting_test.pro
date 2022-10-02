@@ -970,6 +970,7 @@ Pressure_grid(12) = alog(1096d)
 Pressure_grid(13) = alog(1300d)
 Pressure_grid(14) = alog(1500d)
 
+; TBD! indの与え方が違う。初期値とかの部分を変えないといけない。あとは、
 ; (3) 極小値を探す
 ; 最小二乗和の中で最小値を持つindex前後の値を持ってきて、その中間地点での値を出す
 before_pres = (Pressure_grid(min_ind - 1) + Pressure_grid(min_ind))/2
@@ -989,7 +990,9 @@ result_compare = before_interpol < after_interpol
 
 print, "result:", result_compare
 
+repeat begin
 if before_interpol eq result_compare then begin
+
   loop_ind_1 = (Pressure_grid(min_ind - 1) + before_pres)/2
   loop_ind_2 = (Pressure_grid(min_ind) + before_pres)/2
 
@@ -1001,9 +1004,10 @@ if before_interpol eq result_compare then begin
 
   result_compare = before_interpol < after_interpol
   print, "loop_result:", result_compare
-endif
 
-if after_interpol eq result_compare then begin
+endif else  begin
+  
+  repeat begin
   loop_ind_1 = (Pressure_grid(min_ind + 1) + after_pres)/2
   loop_ind_2 = (Pressure_grid(min_ind) + after_pres)/2
 
@@ -1015,10 +1019,9 @@ if after_interpol eq result_compare then begin
 
   result_compare = before_interpol < after_interpol
   print, "loop_result:", result_compare
-endif
 
-
-
+Endelse
+endrep until result_compare gt 0.0001
 
 
 ; *** TBD! ***
