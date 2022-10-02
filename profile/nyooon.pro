@@ -1,5 +1,68 @@
 Pro nyooon
 
+Pressure_grid = dblarr(15)
+Pressure_grid(0) = alog(50d)
+Pressure_grid(1) = alog(150d)
+Pressure_grid(2) = alog(180d)
+Pressure_grid(3) = alog(215d)
+Pressure_grid(4) = alog(257d)
+Pressure_grid(5) = alog(308d)
+Pressure_grid(6) = alog(369d)
+Pressure_grid(7) = alog(442d)
+Pressure_grid(8) = alog(529d)
+Pressure_grid(9) = alog(633d)
+Pressure_grid(10) = alog(758d)
+Pressure_grid(11) = alog(907d)
+Pressure_grid(12) = alog(1096d)
+Pressure_grid(13) = alog(1300d)
+Pressure_grid(14) = alog(1500d)
+
+min_ind = 5
+
+total_LMS = [0.1, 0.2, 0.25, 0.13, 0.3, 0.4, 0.11, 0.56, 0.33, 0.7, 0.43, 0.14, 0.9, 1.0, 0.54]
+
+before_pres = (Pressure_grid(min_ind - 1) + Pressure_grid(min_ind))/2
+after_pres = (Pressure_grid(min_ind + 1) + Pressure_grid(min_ind))/2
+
+before_interpol = interpol(total_LMS, Pressure_grid, before_pres)
+after_interpol = interpol(total_LMS, Pressure_grid, after_pres)
+
+print, "before:", before_interpol
+print, "after:", after_interpol
+
+result_compare = before_interpol < after_interpol
+
+print, "result:", result_compare
+
+repeat begin
+if before_interpol eq result_compare then begin
+
+  loop_ind_1 = (Pressure_grid(min_ind - 1) + before_pres)/2
+  loop_ind_2 = (Pressure_grid(min_ind) + before_pres)/2
+  
+  print, "loop1:", loop_ind_1
+  print, "loop2:", loop_ind_2
+  
+  before_interpol = interpol(total_LMS, Pressure_grid, loop_ind_1)
+  after_interpol = interpol(total_LMS, Pressure_grid, loop_ind_2)
+  
+  result_compare = before_interpol < after_interpol
+  print, "loop_result:", result_compare
+
+endif else  begin
+
+  loop_ind_1 = (Pressure_grid(min_ind + 1) + after_pres)/2
+  loop_ind_2 = (Pressure_grid(min_ind) + after_pres)/2
+    
+  before_interpol = interpol(total_LMS, Pressure_grid, loop_ind_1)
+  after_interpol = interpol(total_LMS, Pressure_grid, loop_ind_2)
+  
+  result_compare = before_interpol < after_interpol
+  print, "loop_result:", result_compare
+
+endelse
+endrep until result_compare gt 0.0001
+
 ;aa = [1,2,3]
 ;
 ;for i =0, 3 do begin
