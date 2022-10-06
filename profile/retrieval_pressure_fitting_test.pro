@@ -934,23 +934,29 @@ total_LMS = LMS9 + LMS10 + LMS11 + LMS12 + LMS13 + LMS14 + LMS15
 
 ; (2) 最小二乗和の中で最小値を探す
 min_LMS = min(total_LMS)
-min_ind = (where(total_LMS eq min_LMS)) + 5
-
-print, "total_LMS", total_LMS
-print, "total_min", min_LMS
-print, "min_ind", min_ind
-help, total_LMS
 
 ; debug →→
+
+; min_ind = (where(total_LMS eq min_LMS)) + 5
+; print, "total_LMS", total_LMS
+; print, "total_min", min_LMS
+; print, "min_ind", min_ind
+; help, total_LMS
 ; total_LMS_1 = LMS0
 ; total_LMS_2 = LMS26
 ; total_LMS_3 = LMS23
 ; total_LMS_4 = LMS24
 ; total_LMS_5 = LMS25
-
 ; print, "LMS0:", LMS0(0)
 ; print, "LMS26:", LMS26(0)
 ; print, "total:", total_LMS
+; print, "before_pres", exp(before_pres)
+; print, "after_pres", exp(after_pres)
+; print, "before:", before_interpol
+; print, "after:", after_interpol
+; print, "result:", result_compare
+
+; ←← debug
 
 ;Surface pressure grid
 Pressure_grid = dblarr(15)
@@ -973,22 +979,45 @@ Pressure_grid(14) = alog(1500d)
 ; TBD! indの与え方が違う。初期値とかの部分を変えないといけない。あとは、
 ; (3) 極小値を探す
 ; 最小二乗和の中で最小値を持つindex前後の値を持ってきて、その中間地点での値を出す
-before_pres = (Pressure_grid(min_ind - 1) + Pressure_grid(min_ind))/2
-after_pres = (Pressure_grid(min_ind + 1) + Pressure_grid(min_ind))/2
+; repeat begin
+min_ind = where(total_LMS eq min_LMS) + 8b
+print, "intial:" ,min_ind
 
-print, "before_pres", exp(before_pres)
-print, "after_pres", exp(after_pres)
+; repeat begin
+for n=0, 5 do begin
+  pup = 1d
+  pdown = -1d
+  d = (1/2d)^n
+
+  before_pres = (Pressure_grid(min_ind - d) + Pressure_grid(min_ind))/2
+  after_pres = (Pressure_grid(min_ind + d) + Pressure_grid(min_ind))/2
 
 ; 最小値からどっちが最小二乗和が小さいかを判断する
-before_interpol = interpol(total_LMS, Pressure_grid, before_pres)
-after_interpol = interpol(total_LMS, Pressure_grid, after_pres)
+  before_interpol = interpol(total_LMS, Pressure_grid, before_pres)
+  after_interpol = interpol(total_LMS, Pressure_grid, after_pres)
 
-print, "before:", before_interpol
-print, "after:", after_interpol
+  result_compare = before_interpol < after_interpol
 
-result_compare = before_interpol < after_interpol
+  if before_interpol eq result_compare then begin
+    min_ind =  min_ind + (pdown*(1/2d)^(n+1))
+    print, "if:" , min_ind
+  endif else  begin
+    min_ind =  min_ind + (pup*(1/2d)^(n+1))
+    print, "else:" ,min_ind
+  Endelse
 
-print, "result:", result_compare
+  ; print, "min_ind:", min_ind
+  ; print, "回数" , n
+
+endfor
+
+print, "LMS_result",result_compare
+
+pressure = interpol(Pressure_grid, total_LMS, result_compare)
+print, "pressure:", exp(pressure)
+
+; endrep until result_compare lt 0.0001
+stop
 
 repeat begin
 if before_interpol eq result_compare then begin
@@ -1006,8 +1035,7 @@ if before_interpol eq result_compare then begin
   print, "loop_result:", result_compare
 
 endif else  begin
-  
-  repeat begin
+
   loop_ind_1 = (Pressure_grid(min_ind + 1) + after_pres)/2
   loop_ind_2 = (Pressure_grid(min_ind) + after_pres)/2
 
@@ -1059,9 +1087,5 @@ endrep until result_compare gt 0.0001
 ; wn(24):6.5631814e-13
 ; wn(25):1.8564746e-06
 ; wn(26):NaN
-
-; 明日やること (9/29)
-; そこからMKSに変えて、I/Fで比較をする
-; fitting routineで困っているところをslack共有、ポンチ図作成
  
 end
