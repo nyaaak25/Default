@@ -1,4 +1,33 @@
+function gauss, x, myu, sigma
+
+gauss_func = 1/(sigma*sqrt(2*!pi))*exp(-(x-myu)^2/2*sigma^2)
+
+return, gauss_func
+
+end
+
 Pro nyooon
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0030_1.sav'
+
+; ガウシアンの定義
+x = reform(wvl(0:127))
+myu2 = 1.9d
+myu3 = 2.3d
+sigma2 = 0.5d / (2* sqrt(2*alog(2)))
+sigma3 = 0.56d / (2* sqrt(2*alog(2)))
+
+y2 = gauss1(x, [1.9d, 0.5d / (2 * sqrt(2*alog(2)))])
+y3 = gauss1(x, [1.9d, 0.56d / (2 * sqrt(2*alog(2)))])
+
+y = y2 + y3
+
+gauss_2 = gauss(x,myu2,sigma2)
+gauss_3 = gauss(x,myu3,sigma3)
+
+gaussian = gauss_2 + gauss_3
+
+
+
 
 Pressure_grid = dblarr(15)
 Pressure_grid(0) = alog(50d)
@@ -18,8 +47,7 @@ Pressure_grid(13) = alog(1300d)
 Pressure_grid(14) = alog(1500d)
 
 min_ind = 5
-
-total_LMS = [0.1, 0.2, 0.25, 0.13, 0.3, 0.4, 0.11, 0.56, 0.33, 0.7, 0.43, 0.14, 0.9, 1.0, 0.54]
+total_LMS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 0.43, 0.14, 0.9, 1.0, 0.54]
 
 before_pres = (Pressure_grid(min_ind - 1) + Pressure_grid(min_ind))/2
 after_pres = (Pressure_grid(min_ind + 1) + Pressure_grid(min_ind))/2
@@ -61,7 +89,7 @@ endif else  begin
   print, "loop_result:", result_compare
 
 endelse
-endrep until result_compare gt 0.0001
+endrep until result_compare le 0.0001
 
 ;aa = [1,2,3]
 ;
