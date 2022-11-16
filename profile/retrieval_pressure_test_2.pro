@@ -926,7 +926,7 @@ for Loop = 0, 3 do begin
         cont = coef(0) + coef(1)*wvl
 
         SZA = reform(geocube(j,8,points(i)))*1.e-4
-        EA = reform(geocube(j,9,points(i)))*1.e-4
+         
         PA = reform(geocube(j,10,points(i)))*1.e-4
         
         ; reflectance factor ( I/F / cos(SZA) )

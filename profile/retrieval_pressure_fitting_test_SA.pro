@@ -828,7 +828,8 @@ for i = 0, nx-1 do Y(i) = interpol(Y_tmp(*,i), Pressure_grid, alog(P(0)))
 restore, '/work1/LUT/Common/specmars_CO2.sav'
 Y = Y/specmars
 
-Y = Y * pyroxenes(x, P(9:11))
+;Y = Y * pyroxenes(x, P(9:11))
+Y = Y * poly(findgen(nx), P(9:10))
 
 return, Y
 stop
@@ -870,7 +871,8 @@ nanserch=where(y0 ge 0 and y0 le 0.0001)
 y0(nanserch)=!VALUES.F_NAN
 
 ref_Mars = interpol(ref(1,*), ref(0,*), x0, /nan)
-good = where(x0 ge 1.2 and x0 le 2.6 and ref_Mars ge 0.995)
+;good = where(x0 ge 1.2 and x0 le 2.6 and ref_Mars ge 0.995)
+good = where(x0 ge 1.2 and x0 le 2.6 and ref_Mars ge 0.99)
 
 window,1
 plot, x0(good), y0(good), thick=3, back=255, color=0, xs=1, ys=1, psym=1, symsize=2, xr=[1.2, 2.6]
@@ -884,10 +886,10 @@ oplot, x0(good), F0, color=60, thick=3
 
 window,0
 plot, x0, y0, xr=[1.2, 2.6], thick=3, back=255, color=0, xs=1, ys=1, psym=-1
-;oplot, x0, ref_Mars*0.32, color=254, thick=3
+oplot, x0, ref_Mars*0.3, color=254, thick=3
 oplot, x0(good), y0(good), color=100, psym=1, thick=3
 oplot, x0, pyroxenes(x0, Result_Fit0), color=200, thick=3
-
+stop
 
 ; CO2 absorption emission line
 CO2=where(wvl gt 1.81 and wvl lt 2.19)
@@ -961,12 +963,23 @@ x = wvl
 y = reform(jdat(xind(0), *, yind(0)))
 y = y/specmars
 
-;retrieval
-pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 12)
+y(0:2) = -0d/0d
+y(7) = -0d/0d
+y(23) = -0d/0d
 
-start = [SP, TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input, Result_Fit0(0), Result_Fit0(1), Result_Fit0(2)]
-pi(1:10).fixed = 1
-err = y*1d-1
+;retrieval
+;pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 12)
+;;start = [SP, TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input, Result_Fit0(0), Result_Fit0(1), Result_Fit0(2)]
+;start = [SP, TA, TB, SZA, EA, PA, 0d, 0d, 0.29, Result_Fit0(0), Result_Fit0(1), Result_Fit0(2)]
+;pi(1:8).fixed = 1
+
+pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 11)
+;start = [SP, TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input, Result_Fit0(0), Result_Fit0(1), Result_Fit0(2)]
+start = [SP, TA, TB, SZA, EA, PA, 0d, 0d, 0.29, 1d, 0d]
+pi(1:8).fixed = 1
+
+err = y*1d-3
+err(*) = median(y)*1d-3
 Result_Fit = MPFITFUN('forward', x, y, err, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
 F = yfit
 
@@ -976,11 +989,19 @@ F = yfit
 ;Result_Fit = MPFITFUN('forward', x, y, err, start2, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
 ;F2 = yfit
 
-window,2, xs=800,ys=800
-plot, x, y, yr=[-0.1,0.3], back=255, color=0, thick=3
-oplot, x, f, color=254, thick=3
-oplot, x, f2, color=60, thick=3
-oplot, x, (y-f), color=200, thick=3
+;good = where(FINITE(y) eq 1)
+;window,2, xs=800,ys=800
+;plot, x(good), y(good), yr=[-0.1,0.3], back=255, color=0, thick=3
+;oplot, x(good), f(good), color=254, thick=3
+
+good = where(FINITE(y) eq 1)
+window,6, xs=800,ys=800
+plot, x(good), y(good), yr=[-0.1,0.3], back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1
+oplot, x(good), f(good), color=0, thick=3, psym=-1, linestyle=2
+oplot, x(good), (y(good)-f(good))*5, color=200, thick=2, psym=-1
+;oplot, x(good), pyroxenes(x(good), Result_Fit(9:11)), color=100
+xyouts, 2.05, 0.1, 'SP='+strcompress(Result_Fit(0)), charsize=2, color=0
+stop
 
 ;
 ;window,1,xs=800,ys=800

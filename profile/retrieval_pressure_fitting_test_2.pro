@@ -1,4 +1,15 @@
 ;---------------------------
+function pyroxenes, x, p
+;---------------------------
+y1 = 1d - gauss1(x, [1.9d, 0.5d / (2 * sqrt(2*alog(2))), P(0)], /peak)
+y2 = 1d - gauss1(x, [2.3d, 0.56d / (2 * sqrt(2*alog(2))), P(1)], /peak)
+y3 = 1d - gauss1(x, [1.025d, 0.187d / (2 * sqrt(2*alog(2))), P(2)], /peak)
+
+y = (y1 + y2+y3)/3d * P(3)
+return, y
+end
+
+;---------------------------
 function forward, x, p
 ;---------------------------
 ;x: wavenumber
@@ -19,15 +30,16 @@ PA = P(5)
 Dust = P(6)
 Waterice = P(7)
 Albedo = P(8)
+;
+;if P(0) gt 1500. then begin
+;  print,'Warning: P > limit'
+;  stop
+;endif
+;if P(0) lt 50. then begin
+;  print,'Warning: P < limit'
+;  stop
+;endif
 
-if P(0) gt 1500. then begin
-  print,'Warning: P > limit'
-  stop
-endif
-if P(0) lt 50. then begin
-  print,'Warning: P < limit'
-  stop
-endif
 if T1 gt 285. then begin
   print,'Warning: T1 > limit'
   stop
@@ -66,11 +78,11 @@ if Waterice gt 1.0 then begin
 endif
 if Albedo gt 0.6 then begin
   print,'Warning: Albedo > limit'
-  ; stop
+  stop
 endif
 if Albedo lt 0.05 then begin
   print,'Warning: Albedo < limit'
-  ; stop
+  stop
 endif
 
 x1a = dblarr(5) ; T1
@@ -187,7 +199,7 @@ for I = 0, 3-1 do begin
 endfor
 skip7:
 
-for I = 0, 6-1 do begin
+for I = 0, 7-1 do begin
   F = x8a(I) - X8
   if (F gt 0.0d0) then j8 = I
   if (F gt 0.0d0) then goto, skip8
@@ -222,7 +234,7 @@ if j8+1 ge 7 then stop
 
 ;mutli-dimensional interpolations
 for i = 0, 15-1 do begin
-  for j = 0, nx-1 do begin
+  for j = 0,nx-1 do begin
     
     if j eq 0 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_rad0.sav'
     if j eq 1 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_rad1.sav'
@@ -251,6 +263,8 @@ for i = 0, 15-1 do begin
     if j eq 24 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_rad24.sav'
     if j eq 25 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_rad25.sav'
     if j eq 26 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_rad26.sav'
+    if j eq 27 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_rad27.sav'
+    if j eq 28 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_rad28.sav'
 
     ;8-dimensional_interpolation
     if i eq 0 then Table_Equivalent_width = Table_Equivalent_Pressure1
@@ -814,31 +828,76 @@ Pressure_grid(12) = alog(1096d)
 Pressure_grid(13) = alog(1300d)
 Pressure_grid(14) = alog(1500d)
 
+
+
 for i = 0, nx-1 do Y(i) = interpol(Y_tmp(*,i), Pressure_grid, alog(P(0)))
 
-Y = Y * (P(9) + P(10)*findgen(7) + P(11)*findgen(7)^2+P(12)*findgen(7)^3)
+restore, '/work1/LUT/Common/CO2_specmars_update.sav'
+Y = Y/specmars
+Y = Y * pyroxenes(x, P(9:12))
+
 return, Y
-stop
 end
 
 
 Pro retrieval_pressure_fitting_test_2
-; fitting test
 
+; Palette　select
+Set_Plot, 'x'
+device, retain=1, decomposed=0
+loadct, 39
+
+; path 
 path = '/data2/omega/sav/'
 path2 = '/work1/LUT/SP/table/absorption/'
-restore, path+'ORB0030_1.sav'
+restore, path+'ORB0363_3.sav'
 restore, path + 'specmars.sav'
 
-; CO2 absorption emission line   
-CO2=where(wvl gt 1.81 and wvl lt 2.19)
-wvl=wvl[CO2]
+; reference spectrum
+ref = dblarr(2,3539)
+openr, lun, '/work1/LUT/Common/psg_trn.txt', /get_lun
+for i = 0, 3539-1 do begin
+  readf, lun, a, b
+  ref(0,i) = a
+  ref(1,i) = b
+endfor
+free_lun,lun
 
+; ind=76094,xind=62, yind=594, lati:22.705700 N , longi:311.76300 E (48.237 W)  [Forget+, retrievalすると852 Pa] ORB0363_3
+ind=where_xyz(longi ge 311.73 and longi le 311.78 and lati ge 22.7 and lati le 22.72, xind=xind, yind=yind)
+
+; test getting surface feature 
+x0 = reform(wvl(0:127))
+y0 = reform(jdat(xind,0:127,yind)/specmars(0:127))
+nanserch=where(y0 ge 0 and y0 le 0.0001)
+y0(nanserch)=!VALUES.F_NAN
+
+ref_Mars = interpol(ref(1,*), ref(0,*), x0, /nan)
+good = where(x0 ge 1.2 and x0 le 2.6 and ref_Mars ge 0.995)
+
+pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 4)
+start = [0.06, 0.06, 0.06, median(y0(good))]
+Result_Fit0 = MPFITFUN('pyroxenes', x0(good), y0(good), y0(good)*1d-2, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
+F0 = yfit
+
+; continuum plot
+; window,1
+; plot, x0(good), y0(good), thick=3, back=255, color=0, xs=1, ys=1, psym=1, symsize=2, xr=[1.2, 2.6]
+; oplot, x0(good), F0, color=60, thick=3
+
+; using determine continuum spectra plot
+; window,0
+; plot, x0, y0, xr=[1.2, 2.6], thick=3, back=255, color=0, xs=1, ys=1, psym=-1
+; oplot, x0, ref_Mars*0.3, color=254, thick=3
+; oplot, x0(good), y0(good), color=100, psym=1, thick=3
+; oplot, x0, pyroxenes(x0, Result_Fit0), color=200, thick=3
+
+; CO2 absorption emission line
+CO2=where(wvl ge 1.8 and wvl le 2.2)
+; CO2=where(wvl gt 1.92 and wvl lt 1.99)  best fit
+wvl=wvl[CO2]
 jdat=jdat(*,CO2,*)
 specmars = specmars(CO2)
-
-; ind=32015, xind=15, yind=1000, lati: 48.431797 S, longi: 60.808998 E [Forget+, retrievalすると1036 Pa] ORB0030_1
-ind=where_xyz(longi ge 60.79 and longi le 60.81 and lati ge -48.44 and lati le -48.43,xind=xind,yind=yind)
 
 nanserch=where(jdat ge 0 and jdat le 0.0001)
 jdat(nanserch)=!VALUES.F_NAN
@@ -901,46 +960,85 @@ EA = reform(geocube(xind,9,yind))*1.e-4
 PA = reform(geocube(xind,10,yind))*1.e-4
 Albedo_input = jdat(xind,0,yind)/specmars(0) / cos(geocube(xind,8,yind)*1e-4*!DTOR)
 
-x = wvl ; 1d4/wvl
+x = wvl
 y = reform(jdat(xind(0), *, yind(0)))
+y = y/specmars
+
+
+; →→  debug
+; initial
+; dust_opacity = 0.121290d
+; Albedo_input = 0.331906d
+
+; 振ってみる
+; dust_opacity = 0.6d
+; Albedo_input = 0.45d
+
+; ←←  debug
 
 ;retrieval
 pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 13)
+start = [SP, TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input, Result_Fit0(0), Result_Fit0(1), Result_Fit0(2),Result_Fit0(3)]
+pi(1:11).fixed = 1
 
-start = [SP, TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input,1d, 0d]
-pi(1:8).fixed = 1
-err = y*1d-1
+; 重み付けを行う
+before_err = y(0:6)*1d
+middle_err = y(7:10)*1d-2
+after_err = y(11:28)*1d
+err = [before_err,middle_err,after_err]
+
+; 1.913, 2.039, 2.136 and 2.178 μm are not taken into account. [Forget+ 2007]
+; y(8)=!VALUES.F_NAN
+; y(17)=!VALUES.F_NAN
+; y(24)=!VALUES.F_NAN
+; y(27)=!VALUES.F_NAN
+
 Result_Fit = MPFITFUN('forward', x, y, err, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
+
 F = yfit
 
+print, "F", F
 
-; start2 = [852d, TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input, 1d, 0d]
-; pi(0:8).fixed = 1
-; err = y*1d-1
-; Result_Fit = MPFITFUN('forward', x, y, err, start2, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
-; F2 = yfit
+y(8)= -0d/0d
+y(17)= -0d/0d
+y(24)= -0d/0d
+y(27)= -0d/0d
 
-Set_Plot, 'x'
-device, retain=1, decomposed=0
-loadct, 39
-window,0
-plot, x, y, yr=[-1,6], back=255, color=0, thick=3
+
+good = where(FINITE(y) eq 1)
+window,6, xs=800,ys=800
+plot, x(good), y(good), yr=[-0.1,0.3], back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1
+oplot, x, F, color=0, thick=3, psym=-1, linestyle=2
+xyouts, 2.05, 0.1, 'SP='+strcompress(Result_Fit(0)), charsize=2, color=0
+stop
+
+start2 = [852d, TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input, Result_Fit0(0), Result_Fit0(1), Result_Fit0(2),Result_Fit0(3)]
+pi(0:11).fixed = 1
+
+before_err = y(0:6)*1d
+middle_err = y(7:10)*1d-2
+after_err = y(11:26)*1d
+err = [before_err,middle_err,after_err]
+
+Result_Fit = MPFITFUN('forward', x, y, err, start2, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
+F2 = yfit
+
+window,2,xs=800,ys=800
+plot, x, y, back=255, color=0, thick=3
 oplot, x, f, color=254, thick=3
-oplot, x, (y-f), color=200, thick=3
-
-
-window,1,xs=800,ys=800
-plot, wvl, y/specmars, yr=[0,0.3], back=255, color=0, thick=3, xr=[1.85, 2.2]
-oplot, wvl, f/specmars, color=254, thick=3
-; oplot, wvl, f2/specmars, color=60, thick=3
+oplot, x, f2, color=60, thick=3
 
 ; fitting test result
-; test data  ORB0030_1  retrievalすると1036 Pa
-; test1  continuum fitting equation: y = ax+b  1234.33 Pa
-; test2  continuum fitting equation: y = ax^2+bx+c  1190.58 Pa
-; test3  continuum fitting equation: y = ax^3+bx^2+cx+d  1179.53 Pa
+; test data  ORB0363_3  retrievalすると852 Pa
+; ini: dust_opacity = 0.121290d
+; ini: Albedo_input = 0.331906d
 
-stop
-stop
+; test1  Dust = ini, ALbedo = ini,  1048.46 Pa
+; test2  Dust = 0d, Albedo = ini  1012.92 Pa
+; test3  Dust = 0.5d, Albedo = ini  1206.67 Pa
+; test4  Dust = ini, Albedo = 0,1d  1163.39 Pa (条件付き、continuumをある程度決定してから振る)
+; test5  Dust = ini, Albedo = 0.5d  under flow, can't calclation
+; test6  Dust = ini, Albedo = 0.4d  1037.70 Pa
+
 
 end
