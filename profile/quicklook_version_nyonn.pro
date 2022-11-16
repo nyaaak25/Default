@@ -17,7 +17,7 @@ files=file_search(pathfile+'*.sav',count=count)
 force=1
 
 ; for loop=0,count-1 do begin
-for loop=0,3 do begin
+for loop=3,4 do begin
   IF force eq 0 THEN BEGIN
     sdir = FILE_SEARCH(path_save + strupcase(FILE_BASENAME(files(loop),'.sav')),COUNT = tnf)
     IF tnf GT 0L THEN CONTINUE
@@ -141,8 +141,7 @@ for loop=0,3 do begin
   minvalue = min(newcolor)
   plotdev = double((newcolor-minvalue)/(maxvalue-minvalue))*255
   colordev = plotdev
-  
-  
+stop
   ; ========= 他の軌道データについて =============
 
   timei=reform(geocube(0:6,1,*))
@@ -174,6 +173,7 @@ for loop=0,3 do begin
   ; CO2吸収量 mapping
   plot,longi(ind),lati(ind), xstyle=1,ystyle=1,title='CO2_absorption',xtitle='latitude'$
     ,color=0,position=[0.05,0.13,0.3,0.92],xticks=2,/nodata, charsize=2
+  Colorbar,position=[0.1,0.03,0.35,0.04]
   plots, longi(ind),lati(ind),color=color2,psym=2
 
   ; 日付と軌道番号、
@@ -187,20 +187,19 @@ for loop=0,3 do begin
   plot,longi(ind),lati(ind),xstyle=1,ystyle=1,title='MOLA altitude',xtitle='latitude'$
     ,color=0,position=[0.35,0.13,0.6,0.92],xticks=2,/nodata, charsize=2
   ;Colorbar,Range=[10,10.5],position=[0.2,0.03,0.7,0.04]
-  Colorbar,position=[0.2,0.03,0.7,0.04]
+  Colorbar,position=[0.4,0.03,0.65,0.04]
   plots, longi(ind),lati(ind),color=colorMOLA,psym=2
 
   ; CO2吸収量 - MOLA高度
   plot,longi(ind),lati(ind),xstyle=1,ystyle=1,title='CO2 - MOLA altitude',xtitle='latitude'$
     ,color=0,position=[0.65,0.13,0.9,0.92],xticks=2,/nodata, charsize=2
+  Colorbar,position=[0.7,0.03,0.95,0.04]
   plots, longi(ind),lati(ind),color=colordev,psym=2
 
   snapshot = TVRD(True=1)
-  Write_JPEG, path_save+fileorbit+'.jpg', snapshot, True=1, Quality=100
+  Write_JPEG, path_save+fileorbit+'_new.jpg', snapshot, True=1, Quality=100
   
   
   erase
 endfor
-
- stop
 end
