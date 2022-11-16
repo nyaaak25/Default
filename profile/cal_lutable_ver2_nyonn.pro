@@ -335,7 +335,7 @@ for IT1 = 1, 5 do begin
                 wn = (1/wn)*10000
 
                 ; ver1
-                band=where(wn gt 1.85 and wn lt 2.10)
+                ; band=where(wn gt 1.85 and wn lt 2.10)
                 
                 ; ver2
                 ; band=where(wn gt 1.94 and wn lt 2.09)
@@ -344,7 +344,7 @@ for IT1 = 1, 5 do begin
                 ; band=where(wn gt 1.94 and wn lt 1.99)
 
                 ; ver4
-                ; band = where(wn gt 1.93 and wn lt 2.04)
+                band = where(wn gt 1.93 and wn lt 2.04)
                 
 
                 rad1 = reverse(rad1)
@@ -534,6 +534,6 @@ save,Table_Equivalent_pressure1,$
      Table_Equivalent_pressure14,$
      Table_Equivalent_pressure15,$
      
-     filename='/work1/LUT/SP/table/absorption/density/Table_SP_calc_ver1_update.sav'
+     filename='/work1/LUT/SP/table/absorption/density/Table_SP_calc_ver4_CO2update.sav'
 stop
 END
