@@ -7,7 +7,42 @@ return, gauss_func
 end
 
 Pro nyooon
+
+; file 検索方法
+Result = file_test(output_name_rad)
+if result eq 0 then begin
+
+
+
+; binary fileを読む
+ind = 0l
+h = 0d
+hi = fltarr(31)
+t = 0d
+ti = fltarr(31)
+p = 0d
+pi = fltarr(31)
+Kw = fltarr(31,101101)
+Kw2 = fltarr(31,101101)
+
+file1 = '/Users/nyonn/IDLWorkspace/Default/savfile/LUTable_T1_285_T2_200_PRS1500.k'
+file2 = '/Users/nyonn/IDLWorkspace/Default/savfile/CO2_SP15_TA5_TB3.k'
+
+openr, 1, file1
+; for i=0,31 -1  do readu, 1, ind, h, t, p, Kw(*,i)
+for i =0, 30 do readu, 1, ind, hi(i), ti(i), pi(i), Kw(*,i)
+close,1
+
+openr, lun, file1, /get_lun
+fs = fstat(lun)
+
+len = fs.size / n_bytes_in_data_structure
+for i = 0L, len - 1 do begin
+  readu, lun, var
+
+
 restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0030_1.sav'
+
 
 ; ガウシアンの定義
 x = reform(wvl(0:127))
