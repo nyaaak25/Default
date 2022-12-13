@@ -8,6 +8,16 @@ end
 
 Pro nyooon
 
+pressure = dblarr(3)
+
+for n =0,1 do begin
+  pressure(n) += 1 + 1
+  
+endfor
+
+print, pressure
+stop
+
 ; file 検索方法
 Result = file_test(output_name_rad)
 if result eq 0 then begin
