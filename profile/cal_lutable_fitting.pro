@@ -66,8 +66,8 @@ for w = 0, 29-1 do begin
       for ISZA = 1, 6 do begin
         for IEA = 1, 5 do begin
           for IPA = 1, 5 do begin
-            for ID = 1, 6 do begin
-              for IWI = 1, 3 do begin
+            for ID = 1, 6 do begin;6 do begin
+              for IWI = 1, 1 do begin;3 do begin
                 for IAB = 1, 7 do begin
                   
                   ;file names
@@ -196,7 +196,7 @@ for w = 0, 29-1 do begin
                                        + '_Dust' + STRCOMPRESS(fix(ID),/REMOVE_AL) $
                                        + '_WaterI' + STRCOMPRESS(fix(IWI),/REMOVE_AL) $
                                        + '_SurfaceA' + STRCOMPRESS(fix(IAB),/REMOVE_AL) + '_rad.dat'                                                                                                            
-  
+;  
                   file15 = path15 + 'SP15' + '_TA' + STRCOMPRESS(fix(IT1),/REMOVE_AL) $
                                        + '_TB' + STRCOMPRESS(fix(IT2),/REMOVE_AL) $
                                        + '_SZA' + STRCOMPRESS(fix(ISZA),/REMOVE_AL) $
@@ -204,7 +204,7 @@ for w = 0, 29-1 do begin
                                        + '_PA' + STRCOMPRESS(fix(IPA),/REMOVE_AL) $
                                        + '_Dust' + STRCOMPRESS(fix(ID),/REMOVE_AL) $
                                        + '_WaterI' + STRCOMPRESS(fix(IWI),/REMOVE_AL) $
-                                       + '_SurfaceA' + STRCOMPRESS(fix(IAB),/REMOVE_AL) + '_rad.dat'
+                                       + '_SurfaceA' + STRCOMPRESS(fix(IAB),/REMOVE_AL) + '_rad_test.dat'
   
   
                   ;read files
@@ -308,12 +308,13 @@ for w = 0, 29-1 do begin
                   
                   free_lun,lun
                   openr,lun,file15,/get_lun
-                  for i = 0, 29-1 do begin
+                  for i = 0, 27-1 do begin
                     readf,lun,a,b
+                    wn(i)=a
                     rad15(i)=b
                   endfor
                   free_lun,lun
-                  
+
                   wn = reverse(wn)
                   wav = 1/wn
                   wn = (1/wn)*10000
@@ -378,8 +379,14 @@ for w = 0, 29-1 do begin
                   Table_Equivalent_pressure13(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad13[w]
                   Table_Equivalent_pressure14(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad14[w]
                   Table_Equivalent_pressure15(IT1-1,IT2-1,ISZA-1,IEA-1,IPA-1,ID-1,IWI-1,IAB-1) = rad15[w]
-  
+                  
+                  ;check
+;                  if IAB eq 1 then ref = rad15[2]
+;                  if IAB ne 1 then print, rad15[2]/ref, (IAB-1)*0.1/0.05d;, '  ', file15
+;                  if IAB ne 1 then spawn, 'ls -l '+file15
+                  
                 endfor
+;                stop
               endfor
             endfor
           endfor
@@ -387,7 +394,7 @@ for w = 0, 29-1 do begin
       endfor
     endfor
   endfor
-
+  
   save,Table_Equivalent_pressure1,$
        Table_Equivalent_pressure2,$
        Table_Equivalent_pressure3,$
@@ -404,7 +411,7 @@ for w = 0, 29-1 do begin
        Table_Equivalent_pressure14,$
        Table_Equivalent_pressure15,$
        
-       filename='/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad'+ STRCOMPRESS(fix(w),/REMOVE_AL) + '.sav'
+       filename='/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad'+ STRCOMPRESS(fix(w),/REMOVE_AL) + '.sav'
        
 endfor
 END

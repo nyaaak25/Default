@@ -87,7 +87,7 @@ for IT1 = 1, 5 do begin
       for IEA = 1, 5 do begin
         for IPA = 1, 5 do begin
           for ID = 1, 6 do begin
-            for IWI = 1, 3 do begin
+            for IWI = 1, 1 do begin
               for IAB = 1, 7 do begin
                 
                 ;file names
@@ -224,7 +224,7 @@ for IT1 = 1, 5 do begin
                                      + '_PA' + STRCOMPRESS(fix(IPA),/REMOVE_AL) $
                                      + '_Dust' + STRCOMPRESS(fix(ID),/REMOVE_AL) $
                                      + '_WaterI' + STRCOMPRESS(fix(IWI),/REMOVE_AL) $
-                                     + '_SurfaceA' + STRCOMPRESS(fix(IAB),/REMOVE_AL) + '_rad.dat'
+                                     + '_SurfaceA' + STRCOMPRESS(fix(IAB),/REMOVE_AL) + '_rad_test.dat'
 
 
                 ;read files
@@ -339,16 +339,16 @@ for IT1 = 1, 5 do begin
                 wn = (1/wn)*10000
 
                 ; ver1
-                band=where(wn gt 1.85 and wn lt 2.10)
+                ;band=where(wn gt 1.85 and wn lt 2.10)
                 
                 ; ver2
-                ; band=where(wn gt 1.94 and wn lt 2.09)
+                ;band=where(wn gt 1.94 and wn lt 2.09)
 
                 ; ver3
-                ; band=where(wn gt 1.94 and wn lt 1.99)
+                ;band=where(wn gt 1.94 and wn lt 1.99)
 
                 ; ver4
-                ; band = where(wn gt 1.93 and wn lt 2.04)
+                band = where(wn gt 1.93 and wn lt 2.04)
                 
 
                 rad1 = reverse(rad1)
@@ -579,6 +579,6 @@ save,Table_Equivalent_pressure1,$
      Table_Equivalent_pressure14,$
      Table_Equivalent_pressure15,$
      
-     filename='/work1/LUT/SP/table/absorption/density/Table_SP_calc_ver1_CO2update.sav'
+     filename='/work1/LUT/SP/table/absorption/density/Table_SP_calc_ver4_LUTupdate.sav'
 stop
 END
