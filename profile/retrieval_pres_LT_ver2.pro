@@ -20,7 +20,7 @@ function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
   T2 = TB
 
   ;restore
-  restore,'/work1/LUT/SP/table/absorption/density/Table_SP_calc_ver4_CO2update.sav'
+  restore,'/work1/LUT/SP/table/absorption/density/Table_SP_calc_ver3_LUTupdate.sav'
 
   ;result
   pressure_CD = -999d
@@ -525,7 +525,7 @@ function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
     t5 = (x5-x5a(j5)) / (x5a(j5+1)-x5a(j5))
     t6 = (x6-x6a(j6)) / (x6a(j6+1)-x6a(j6))
     t7 = (x7-x7a(j7)) / (x7a(j7+1)-x7a(j7))
-    t8 = (x8-x8a(j7)) / (x8a(j8+1)-x8a(j8))
+    t8 = (x8-x8a(j8)) / (x8a(j8+1)-x8a(j8))
 
     y(i) = y11111111*(1.d - t1)*(1.d - t2)*(1.d - t3)*(1.d - t4)*(1.d - t5)*(1.d - t6)*(1.d - t7)*(1.d - t8) +   $
       y21111111*t1*(1.d - t2)*(1.d - t3)*(1.d - t4)*(1.d - t5)*(1.d - t6)*(1.d - t7)*(1.d - t8) +   $
@@ -804,7 +804,7 @@ Pro retrieval_pres_LT_ver2
 
 path = '/data2/omega/sav/'
 path2 = '/work1/LUT/SP/table/absorption/'
-restore, path+'ORB0030_1.sav'
+restore, path+'ORB0363_3.sav'
 restore, path + 'specmars.sav'
 
 ; CO2 absorption emission line   
@@ -815,13 +815,13 @@ jdat=jdat(*,CO2,*)
 specmars = specmars(CO2)
 
 ; ind=32015, xind=15, yind=1000, lati: 48.431797 S, longi: 60.808998 E [Forget+, retrievalすると1036 Pa] ORB0030_1
-ind=where_xyz(longi ge 60.79 and longi le 60.81 and lati ge -48.44 and lati le -48.43,xind=xind,yind=yind)
+;ind=where_xyz(longi ge 60.79 and longi le 60.81 and lati ge -48.44 and lati le -48.43,xind=xind,yind=yind)
 
 ; ind=76094,xind=62, yind=594, lati:22.705700 N , longi:311.76300 E (48.237 W)  [Forget+, retrievalすると852 Pa] ORB0363_3
-; ind=where_xyz(longi ge 311.73 and longi le 311.78 and lati ge 22.7 and lati le 22.72,xind=xind,yind=yind)
+ind=where_xyz(longi ge 311.73 and longi le 311.78 and lati ge 22.7 and lati le 22.72,xind=xind,yind=yind)
 
 ; ind=37135, xind=15, yind=1160, lati:7.764°S, longi:24.980°E　[Forget+, retrievalすると470 Pa] ORB1201_3
-; ind=where_xyz(longi ge 24.979 and longi le 24.981 and lati ge -7.765 and lati le -7.763,xind=xind,yind=yind)
+;ind=where_xyz(longi ge 24.979 and longi le 24.981 and lati ge -7.765 and lati le -7.763,xind=xind,yind=yind)
 
 ; ind = 68287, xind=63, yind=533, lati:51.068897 N, longi:276.50281 E, 青木さんの結果を再現 ORB0931_3
 ; ind=where_xyz(longi ge 276.50 and longi le 276.51 and lati ge 51.05 and lati le 51.1,xind=xind,yind=yind)
@@ -834,10 +834,10 @@ ind=where_xyz(longi ge 60.79 and longi le 60.81 and lati ge -48.44 and lati le -
 ; band=where(wvl gt 1.94 and wvl lt 2.09)
 
 ; band幅のupdatte ver3 → work3_***.sav fileに格納
-; band=where(wvl gt 1.94 and wvl lt 1.99)
+band=where(wvl gt 1.94 and wvl lt 1.99)
 
 ; band幅のupdatte ver4 → ver4_***.sav fileに格納
-band = where(wvl gt 1.93 and wvl lt 2.04)
+;band = where(wvl gt 1.93 and wvl lt 2.04)
 
 ; 1.913, 2.039, 2.136 and 2.178 μm are not taken into account. [Forget+ 2007]
 jdat(8)=!VALUES.F_NAN
@@ -916,8 +916,10 @@ width = 1.0 - jdat(xind,*,yind)/cont
 trans = total(width[band], /nan)
 dust_opacity = 0.0d
 ice_opacity = 0.0d
+
 pressure = ret_pressure(trans, TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input)
 print, "dust", dust_opacity
+print, "Albedo", Albedo_input
 print, "ice", ice_opacity
 print, exp(pressure(xind,yind))
 
