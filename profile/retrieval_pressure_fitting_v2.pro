@@ -233,35 +233,35 @@ if j8+1 ge 7 then stop
 for i = 0, 15-1 do begin
   for j = 0, nx-1 do begin
     
-    if j eq 0 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad0.sav'
-    if j eq 1 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad1.sav'
-    if j eq 2 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad2.sav'
-    if j eq 3 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad3.sav'
-    if j eq 4 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad4.sav'
-    if j eq 5 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad5.sav'
-    if j eq 6 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad6.sav'
-    if j eq 7 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad7.sav'
-    if j eq 8 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad8.sav'
-    if j eq 9 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad9.sav'
-    if j eq 10 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad10.sav'
-    if j eq 11 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad11.sav'
-    if j eq 12 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad12.sav'
-    if j eq 13 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad13.sav'
-    if j eq 14 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad14.sav'
-    if j eq 15 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad15.sav'
-    if j eq 16 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad16.sav'
-    if j eq 17 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad17.sav'
-    if j eq 18 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad18.sav'
-    if j eq 19 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad19.sav'
-    if j eq 20 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad20.sav'
-    if j eq 21 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad21.sav'
-    if j eq 22 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad22.sav'
-    if j eq 23 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad23.sav'
-    if j eq 24 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad24.sav'
-    if j eq 25 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad25.sav'
-    if j eq 26 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad26.sav'
-    if j eq 27 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad27.sav'
-    if j eq 28 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_rad28.sav'
+    if j eq 0 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad0.sav'
+    if j eq 1 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad1.sav'
+    if j eq 2 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad2.sav'
+    if j eq 3 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad3.sav'
+    if j eq 4 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad4.sav'
+    if j eq 5 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad5.sav'
+    if j eq 6 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad6.sav'
+    if j eq 7 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad7.sav'
+    if j eq 8 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad8.sav'
+    if j eq 9 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad9.sav'
+    if j eq 10 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad10.sav'
+    if j eq 11 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad11.sav'
+    if j eq 12 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad12.sav'
+    if j eq 13 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad13.sav'
+    if j eq 14 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad14.sav'
+    if j eq 15 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad15.sav'
+    if j eq 16 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad16.sav'
+    if j eq 17 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad17.sav'
+    if j eq 18 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad18.sav'
+    if j eq 19 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad19.sav'
+    if j eq 20 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad20.sav'
+    if j eq 21 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad21.sav'
+    if j eq 22 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad22.sav'
+    if j eq 23 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad23.sav'
+    if j eq 24 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad24.sav'
+    if j eq 25 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad25.sav'
+    if j eq 26 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad26.sav'
+    if j eq 27 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad27.sav'
+    if j eq 28 then restore,'/work1/LUT/SP/table/LUT_fitting/Table_calc_wave_new_update_rad28.sav'
 
     ;8-dimensional_interpolation
     if i eq 0 then Table_Equivalent_width = Table_Equivalent_Pressure1
@@ -545,7 +545,7 @@ for i = 0, 15-1 do begin
     t5 = (x5-x5a(j5)) / (x5a(j5+1)-x5a(j5))
     t6 = (x6-x6a(j6)) / (x6a(j6+1)-x6a(j6))
     t7 = (x7-x7a(j7)) / (x7a(j7+1)-x7a(j7))
-    t8 = (x8-x8a(j7)) / (x8a(j8+1)-x8a(j8))
+    t8 = (x8-x8a(j8)) / (x8a(j8+1)-x8a(j8))
   
     y_tmp(i,j) = y11111111*(1.d - t1)*(1.d - t2)*(1.d - t3)*(1.d - t4)*(1.d - t5)*(1.d - t6)*(1.d - t7)*(1.d - t8) +   $
       y21111111*t1*(1.d - t2)*(1.d - t3)*(1.d - t4)*(1.d - t5)*(1.d - t6)*(1.d - t7)*(1.d - t8) +   $
@@ -999,13 +999,85 @@ pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 11)
 ;start = [SP, TA, TB, SZA, EA, PA, 0d, 0d, 0.29, 1d, 0d]
 ;pi(1:11).fixed = 1
 
-start = [SP, TA, TB, SZA, EA, PA, 0d, 0d, Albedo_input, 1d, 0d]
+; Kazama LUT
+; A = 0.15
+start = [SP, TA, TB, SZA, EA, PA, 0.04d, 0d, 0.15, 1d, 0d]
 pi(1:8).fixed = 1
-
 err = y*1d-3
 err(*) = median(y)*1d-3
 Result_Fit = MPFITFUN('forward', x, y, err, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
 F = yfit
+con = poly(findgen(29), Result_Fit(9:10))
+
+start1 = [SP, TA, TB, SZA, EA, PA, 0.44d, 0d, 0.15, 1d, 0d]
+pi(1:8).fixed = 1
+Result_Fit1 = MPFITFUN('forward', x, y, err, start1, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit1, /nan)
+F1 = yfit1
+con1 = poly(findgen(29), Result_Fit1(9:10))
+
+start2 = [SP, TA, TB, SZA, EA, PA, 0.24d, 0d, 0.15, 1d, 0d]
+pi(1:8).fixed = 1
+Result_Fit2 = MPFITFUN('forward', x, y, err, start2, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit2, /nan)
+F2 = yfit2
+con2 = poly(findgen(29), Result_Fit2(9:10))
+
+; A = 0.29
+start3 = [SP, TA, TB, SZA, EA, PA, 0.04d, 0d, 0.29, 1d, 0d]
+pi(1:8).fixed = 1
+Result_Fit3 = MPFITFUN('forward', x, y, err, start3, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit3, /nan)
+F3 = yfit3
+con3 = poly(findgen(29), Result_Fit3(9:10))
+
+start4 = [SP, TA, TB, SZA, EA, PA, 0.44d, 0d, 0.29, 1d, 0d]
+pi(1:8).fixed = 1
+Result_Fit4 = MPFITFUN('forward', x, y, err, start4, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit4, /nan)
+F4 = yfit4
+con4 = poly(findgen(29), Result_Fit4(9:10))
+
+start5 = [SP, TA, TB, SZA, EA, PA, 0.24d, 0d, 0.29, 1d, 0d]
+pi(1:8).fixed = 1
+Result_Fit5 = MPFITFUN('forward', x, y, err, start5, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit5, /nan)
+F5 = yfit5
+con5 = poly(findgen(29), Result_Fit5(9:10))
+
+; Forgetの値
+; A = 0.15
+start6 = [867.5d, TA, TB, SZA, EA, PA, 0.44d, 0d, 0.15, 1d, 0d]
+pi(0:8).fixed = 1
+Result_Fit6 = MPFITFUN('forward', x, y, err, start6, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit6, /nan)
+F6 = yfit6
+con6 = poly(findgen(29), Result_Fit6(9:10))
+
+start7 = [822.5d, TA, TB, SZA, EA, PA, 0.24d, 0d, 0.15, 1d, 0d]
+pi(0:8).fixed = 1
+Result_Fit7 = MPFITFUN('forward', x, y, err, start7, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit7, /nan)
+F7 = yfit7
+con7 = poly(findgen(29), Result_Fit7(9:10))
+
+start8 = [786.5d, TA, TB, SZA, EA, PA, 0.04d, 0d, 0.15, 1d, 0d]
+pi(0:8).fixed = 1
+Result_Fit8 = MPFITFUN('forward', x, y, err, start8, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit8, /nan)
+F8 = yfit8
+con8 = poly(findgen(29), Result_Fit8(9:10))
+
+; A = 0.29
+start9 = [837.5d, TA, TB, SZA, EA, PA, 0.44d, 0d, 0.29, 1d, 0d]
+pi(0:8).fixed = 1
+Result_Fit9 = MPFITFUN('forward', x, y, err, start9, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit9, /nan)
+F9 = yfit9
+con9 = poly(findgen(29), Result_Fit9(9:10))
+
+start10 = [822.5d, TA, TB, SZA, EA, PA, 0.24d, 0d, 0.29, 1d, 0d]
+pi(0:8).fixed = 1
+Result_Fit10 = MPFITFUN('forward', x, y, err, start10, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit10, /nan)
+F10 = yfit10
+con10 = poly(findgen(29), Result_Fit10(9:10))
+
+start11 = [815.5d, TA, TB, SZA, EA, PA, 0.04d, 0d, 0.29, 1d, 0d]
+pi(0:8).fixed = 1
+Result_Fit11 = MPFITFUN('forward', x, y, err, start11, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit11, /nan)
+F11 = yfit11
+con11 = poly(findgen(29), Result_Fit11(9:10))
 
 ;start2 = [852d, TA, TB, SZA, EA, PA, 0d, 0d, 0.29, 1d, 0d]
 ;pi(0:8).fixed = 1
@@ -1020,6 +1092,144 @@ f(17) = -0d/0d
 f(24) = -0d/0d
 f(27) = -0d/0d
 
+con(0:3) = -0d/0d
+con(8) = -0d/0d
+con(17) = -0d/0d
+con(24) = -0d/0d
+con(27) = -0d/0d
+
+f1(0:3) = -0d/0d
+f1(8) = -0d/0d
+f1(17) = -0d/0d
+f1(24) = -0d/0d
+f1(27) = -0d/0d
+
+con1(0:3) = -0d/0d
+con1(8) = -0d/0d
+con1(17) = -0d/0d
+con1(24) = -0d/0d
+con1(27) = -0d/0d
+
+f2(0:3) = -0d/0d
+f2(8) = -0d/0d
+f2(17) = -0d/0d
+f2(24) = -0d/0d
+f2(27) = -0d/0d
+
+con2(0:3) = -0d/0d
+con2(8) = -0d/0d
+con2(17) = -0d/0d
+con2(24) = -0d/0d
+con2(27) = -0d/0d
+
+f3(0:3) = -0d/0d
+f3(8) = -0d/0d
+f3(17) = -0d/0d
+f3(24) = -0d/0d
+f3(27) = -0d/0d
+
+con3(0:3) = -0d/0d
+con3(8) = -0d/0d
+con3(17) = -0d/0d
+con3(24) = -0d/0d
+con3(27) = -0d/0d
+
+f4(0:3) = -0d/0d
+f4(8) = -0d/0d
+f4(17) = -0d/0d
+f4(24) = -0d/0d
+f4(27) = -0d/0d
+
+con4(0:3) = -0d/0d
+con4(8) = -0d/0d
+con4(17) = -0d/0d
+con4(24) = -0d/0d
+con4(27) = -0d/0d
+
+f5(0:3) = -0d/0d
+f5(8) = -0d/0d
+f5(17) = -0d/0d
+f5(24) = -0d/0d
+f5(27) = -0d/0d
+
+con5(0:3) = -0d/0d
+con5(8) = -0d/0d
+con5(17) = -0d/0d
+con5(24) = -0d/0d
+con5(27) = -0d/0d
+
+f6(0:3) = -0d/0d
+f6(8) = -0d/0d
+f6(17) = -0d/0d
+f6(24) = -0d/0d
+f6(27) = -0d/0d
+
+con6(0:3) = -0d/0d
+con6(8) = -0d/0d
+con6(17) = -0d/0d
+con6(24) = -0d/0d
+con6(27) = -0d/0d
+
+f7(0:3) = -0d/0d
+f7(8) = -0d/0d
+f7(17) = -0d/0d
+f7(24) = -0d/0d
+f7(27) = -0d/0d
+
+con7(0:3) = -0d/0d
+con7(8) = -0d/0d
+con7(17) = -0d/0d
+con7(24) = -0d/0d
+con7(27) = -0d/0d
+
+F8(0:3) = -0d/0d
+F8(8) = -0d/0d
+F8(17) = -0d/0d
+F8(24) = -0d/0d
+F8(27) = -0d/0d
+
+con8(0:3) = -0d/0d
+con8(8) = -0d/0d
+con8(17) = -0d/0d
+con8(24) = -0d/0d
+con8(27) = -0d/0d
+
+F9(0:3) = -0d/0d
+F9(8) = -0d/0d
+F9(17) = -0d/0d
+F9(24) = -0d/0d
+F9(27) = -0d/0d
+
+con9(0:3) = -0d/0d
+con9(8) = -0d/0d
+con9(17) = -0d/0d
+con9(24) = -0d/0d
+con9(27) = -0d/0d
+
+F10(0:3) = -0d/0d
+F10(8) = -0d/0d
+F10(17) = -0d/0d
+F10(24) = -0d/0d
+F10(27) = -0d/0d
+
+con10(0:3) = -0d/0d
+con10(8) = -0d/0d
+con10(17) = -0d/0d
+con10(24) = -0d/0d
+con10(27) = -0d/0d
+
+F11(0:3) = -0d/0d
+F11(8) = -0d/0d
+F11(17) = -0d/0d
+F11(24) = -0d/0d
+F11(27) = -0d/0d
+
+con11(0:3) = -0d/0d
+con11(8) = -0d/0d
+con11(17) = -0d/0d
+con11(24) = -0d/0d
+con11(27) = -0d/0d
+
 ;f2(0:3) = -0d/0d
 ;f2(8) = -0d/0d
 ;f2(17) = -0d/0d
@@ -1029,10 +1239,15 @@ f(27) = -0d/0d
 good = where(FINITE(y) eq 1)
 window,6, xs=800,ys=800
 ; plot, x(good), y(good), yr=[-0.1,0.3], back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1
-plot, x(good), y(good), yr=[-0.1,0.4],back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1
+;plot, x(good), y(good), yr=[-0.1,0.4],back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1
 ;oplot, x(good), f2(good), color=60, thick=3, psym=-1
-oplot, x(good), f(good), color=254, thick=2, psym=-1, linestyle=2
-oplot, x(good), (y(good)-f(good))*5, color=200, thick=2, psym=-1
+plot, x(good), f(good),  back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1, yr = [-0.1, 2.5], ys = 1
+oplot, x(good), f1(good), color=60, thick=2, psym=-1, linestyle=2
+oplot, x(good), f2(good), color=254, thick=2, psym=-1, linestyle=2
+oplot, x(good), con(good), color=0, thick=2, psym=-1, linestyle=2
+oplot, x(good), con1(good), color=60, thick=2, psym=-1, linestyle=2
+oplot, x(good), con2(good), color=254, thick=2, psym=-1, linestyle=2
+;oplot, x(good), (y(good)-f(good))*5, color=200, thick=2, psym=-1
 ;oplot, x(good), (y(good)-f2(good))*5, color=180, thick=2, psym=-1
 ;oplot, x(good), pyroxenes(x(good), Result_Fit(9:11)), color=100
 ;xyouts, 2.05, 0.1, 'SP='+strcompress(Result_Fit(0)), charsize=2, color=0
