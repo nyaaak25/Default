@@ -1,3 +1,7 @@
+
+
+; バイナリファイルを読み込んで吸収係数を比較するプログラム
+
 pro test 
 
 
@@ -66,13 +70,24 @@ oplot, x, KW2_K(30, *), color=0
 stop
 
 window, 0
-plot, x, KW_SA(30, *), /ylog, back=255, color=0, xs=1, xr=[5200,5410]
+plot, x, KW_SA(30, *), /ylog, back=255, color=0, xs=1
 oplot, x, KW3_K(30, *), color=60, linestyle=2 ;青：風間cutoff120
 ; oplot, x, KW_SA(30, *), color=254;, thick=3 ; 赤：青木
 oplot, x, KW2_K(30, *), color=0, linestyle=2;, thick=3, linestyle=2 ; 黒：風間cutoff300
 oplot, x, KW4_K(30, *), color=120, linestyle=2
 oplot, x, KW_SA(30, *), color=254 
 stop
+
+window, 2
+plot, x, (KW3_K(30, *)-KW_SA(30, *)), back=255, color=0, xs=1
+oplot, x, (KW2_K(30, *)-KW_SA(30, *)),  color=60
+oplot, x, (KW4_K(30, *)-KW_SA(30, *)),  color=120
+stop
+
+window, 2
+plot, x, (KW3_K(30, *)-KW_SA(30, *))* /KW_SA(30, *), back=255, color=0, xs=1
+oplot, x, (KW2_K(30, *)-KW_SA(30, *))*100 /KW_SA(30, *),  color=60
+oplot, x, (KW4_K(30, *)-KW_SA(30, *))*100 /KW_SA(30, *),  color=120
 
 window, 0
 plot, x, KW2_K(30, *), /ylog, back=255, color=0, xs=1, xr=[5400,5410]

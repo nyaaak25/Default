@@ -67,7 +67,7 @@ for w = 0, 29-1 do begin
         for IEA = 1, 5 do begin
           for IPA = 1, 5 do begin
             for ID = 1, 6 do begin;6 do begin
-              for IWI = 1, 1 do begin;3 do begin
+              for IWI = 1, 3 do begin;3 do begin
                 for IAB = 1, 7 do begin
                   
                   ;file names

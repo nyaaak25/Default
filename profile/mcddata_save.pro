@@ -24,14 +24,15 @@ path = '/data2/omega/sav/'
 path2 = '/work1/LUT/SP/table/absorption/'
 
 ; 相対誤差の比較のためのORB [Forget+ 2007] Fig 13
-;restore, path+'ORB0920_3.sav'
-restore, path+'ORB0931_3.sav'
+restore, path+'ORB0920_3.sav'
+;restore, path+'ORB0931_3.sav'
+;restore, path+'ORB1345_2.sav'
 
 restore, path + 'specmars.sav'
 
 ;ORB0920_3
 ;ind = where_xyz(longi ge 273 and longi le 277 and lati ge 53 and lati le 56, xind=xind, yind=yind)
-ind = where_xyz(longi ge 274 and longi le 277 and lati ge 54 and lati le 56, xind=xind, yind=yind)
+;ind = where_xyz(longi ge 274 and longi le 277 and lati ge 54 and lati le 56, xind=xind, yind=yind)
 
 ; ORB0931_3
 ;ind = where_xyz(longi ge 272 and longi le 277 and lati ge 50 and lati le 61, xind=xind, yind=yind)
@@ -41,10 +42,10 @@ ip = n_elements(LATI(*,0))
 io = n_elements(LATI(0,*))
 
 ; loop変数
-ip_b = min(xind)
-ip_a = max(xind)
-io_b = min(yind)
-io_a = max(yind)
+;ip_b = min(xind)
+;ip_a = max(xind)
+;io_b = min(yind)
+;io_a = max(yind)
 
 ; create array
 MCDpressure = dblarr(ip,io)
@@ -52,11 +53,13 @@ dustmap = dblarr(ip,io)
 TAmap = dblarr(ip,io)
 altitude = dblarr(ip,io)
 albedo = dblarr(ip,io)
+MOLA = dblarr(ip,io)
 
-for l = ip_b, ip_a -1 do begin ;loop for slit scan
-  for k = io_b, io_a -1 do begin ;test getting surface feature
+;for l = ip_b, ip_a -1 do begin ;loop for slit scan
+;  for k = io_b, io_a -1 do begin ;test getting surface feature
 
-    start_time = systime(1)
+for l = 0, ip-1 do begin ;loop for slit scan
+  for k = 0, io-1 do begin ;test getting surface feature
     ;   ----- MCD ------
     lat = lati(l,k)
     lon = longi(l,k)
@@ -93,7 +96,9 @@ for l = ip_b, ip_a -1 do begin ;loop for slit scan
       dset,scena,perturkey,seedin,gwlength,extvarkeys, $
       pres,dens,temp,zonwind,merwind,meanvar,extvar,seedout,ierr)
     scaleH = extvar(13)
-    Z1 = scaleH * 0.1d
+    ;Z1 = scaleH * 0.1d
+    MOLA_altitude = extvar(4)
+    Z1 = 1d3
     Z2 = scaleH * 4d
     dust_opacity = extvar(36)*1.2090217E+00/4.6232791E+00
     ice_opacity = 0.d;*4.2410289E-01/***  ;!TBD!
@@ -123,9 +128,10 @@ for l = ip_b, ip_a -1 do begin ;loop for slit scan
     MCDpressure(l,k) = SP
     dustmap(l,k) = dust 
     TAmap(l,k) = TA
+    MOLA(l,k) = MOLA_altitude
 
-    end_time = systime(1)
-    save, lati, longi, altitude, dustmap, TAmap, MCDpressure, albedo, filename='/work1/LUT/SP/table/absorption/mcddata_ORB0931_3.sav'
+   
+    save, lati, longi, altitude, dustmap, TAmap, MCDpressure, albedo, MOLA, filename='/work1/LUT/SP/table/absorption/mcddata_ORB920_3_TA1km.sav'
 
   endfor
 endfor
