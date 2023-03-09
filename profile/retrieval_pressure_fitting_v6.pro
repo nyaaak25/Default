@@ -22,6 +22,7 @@
 ;
 ; retrieval_pressure_fitting_v6　 ::2022.12.12 Mon 15:38:00
 ; ver6: fitting (気圧+AlbedoがFree) によるpressure mapを導入
+; ver6.1: continuum + best fit spectrumもsav fileに追加 [Edit 2022.12.13]
 ; !TBD! MCDの読み出し分のみだけを回すようにする 
 ;
 ; +++
@@ -534,7 +535,6 @@ return, y_tmp
 end
 
 
-
 ;---------------------------
 function forward, x, p
 ;---------------------------
@@ -543,7 +543,7 @@ function forward, x, p
 ;return: radiance
 ;---------------------------
 
-restore, '/work1/LUT/Common/fitting_ytmp_albedo_3.sav'
+restore, '/work1/LUT/Common/fitting_ytmp_albedo_1.sav'
 nx = n_elements(x)
 y = dblarr(nx)
 
@@ -599,13 +599,13 @@ t2 = (P(1)-Albedo_grid(j2)) / (Albedo_grid(j2+1)-Albedo_grid(j2))
 Y(*) = Y_tmp(j1,*,j2)*(1.d - t1)*(1.d - t2) + Y_tmp(j1+1,*,j2)*t1*(1.d - t2) + Y_tmp(j1,*,j2+1)*(1.d - t1)*t2 + Y_tmp(j1+1,*,j2+1)*t1*t2
 
 restore, '/work1/LUT/Common/specmars_CO2_update.sav'
-Y = Y/specmars
+;Y = Y/specmars
 
 ; 2 gaussian continuum
-;Y = Y * ( pyroxenes(x, P(2:4)) / mean(pyroxenes(x, P(2:4))) )
+Y = Y * ( pyroxenes(x, P(2:4)) / mean(pyroxenes(x, P(2:4))) )
 
 ; simple continuum
-Y = Y * poly(findgen(nx)-float(nx/2), [P(2:3)])
+;Y = Y * poly(findgen(nx)-float(nx/2), [P(2:3)])
 
 return, Y
 end
@@ -618,6 +618,7 @@ y2 = 1d - gauss1(x, [2.3d, 0.56d / (2 * sqrt(2*alog(2))), P(1)], /peak)
 y = (y1 + y2)/2d * P(2)
 return, y
 end
+
 
 
 
@@ -644,22 +645,19 @@ restore, path + 'specmars.sav'
 ;reference spectrum
 ; W guassiunのときに使う
 ; =========
-;ref = dblarr(2,3539)
-;openr, lun, '/work1/LUT/Common/psg_trn.txt', /get_lun
-;for i = 0, 3539-1 do begin
-;  readf, lun, a, b
-;  ref(0,i) = a
-;  ref(1,i) = b
-;endfor
-;free_lun,lun
+ref = dblarr(2,3539)
+openr, lun, '/work1/LUT/Common/psg_trn.txt', /get_lun
+for i = 0, 3539-1 do begin
+  readf, lun, a, b
+  ref(0,i) = a
+  ref(1,i) = b
+endfor
+free_lun,lun
 ; =========
 
-;ORB0920_3
 ;ind = where_xyz(longi ge 273 and longi le 277 and lati ge 53 and lati le 56, xind=xind, yind=yind)
+; Block 1
 ind = where_xyz(longi ge 274 and longi le 277 and lati ge 54 and lati le 56, xind=xind, yind=yind)
-
-; ORB0931_3
-;ind = where_xyz(longi ge 272 and longi le 277 and lati ge 50 and lati le 61, xind=xind, yind=yind)
 
 ; 全部のやつ
 ip = n_elements(LATI(*,0))
@@ -678,9 +676,10 @@ Albedomap = dblarr(ip,io)
 dustmap = dblarr(ip,io)
 TAmap = dblarr(ip,io)
 altitude = dblarr(ip,io)
+bestfit = dblarr(ip,io,29)
+continuum = dblarr(ip,io,29)
 
 y_tmp = dblarr(15, 29)
-
 
 for l = ip_b, ip_a -1 do begin ;loop for slit scan
   for k = io_b, io_a -1 do begin ;test getting surface feature
@@ -742,19 +741,20 @@ for l = ip_b, ip_a -1 do begin ;loop for slit scan
     ; W gaussiunで使う
     ; =========
     ; continuum の決定
-    ;x0 = reform(wvl(0:127))
-    ;y0 = reform(jdat(l,0:127,k)/specmars(0:127))
-    ;nanserch=where(y0 ge 0 and y0 le 0.0001)
-    ;y0(nanserch)=!VALUES.F_NAN
+    x0 = reform(wvl(0:127))
+    y0 = reform(jdat(l,0:127,k)/specmars(0:127))
+    nanserch=where(y0 ge 0 and y0 le 0.0001)
+    y0(nanserch)=!VALUES.F_NAN
 
-    ;ref_Mars = interpol(ref(1,*), ref(0,*), x0, /nan)
-    ;good = where(x0 ge 1.2 and x0 le 2.6 and ref_Mars ge 0.99)
+    ref_Mars = interpol(ref(1,*), ref(0,*), x0, /nan)
+    good = where(x0 ge 1.2 and x0 le 2.6 and ref_Mars ge 0.9996)
 
     ; continuumの定数を決める
-    ;pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 3)
-    ;start = [0.06, 0.06, median(y0(good))]
-    ;Result_Fit0 = MPFITFUN('pyroxenes', x0(good), y0(good), y0(good)*1d-2, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
-    ;F0 = yfit
+    pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D], MPPRINT:[0]}, 3)
+    start = [0.06d, 0.06d, median(y0(good))]
+    Result_Fit0 = MPFITFUN('pyroxenes', x0(good), y0(good), y0(good)*1d-2, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, NPRINT=0, status=status, yfit=yfit, /nan)
+    pi(*).MPPRINT = 0
+    F0 = yfit
     ; =========
 
     ; CO2 absorption emission line
@@ -774,11 +774,12 @@ for l = ip_b, ip_a -1 do begin ;loop for slit scan
     
     Waterice = ice_opacity
     Albedo = Albedo_input
-    dust = 0.0744d
+    dust = dust_opacity
 
     MCDpressure(l,k) = SP
-    ;dustmap(l,k) = dust 
+    dustmap(l,k) = dust 
     TAmap(l,k) = TA
+    ;dust = 0.0744d ;test
     ;dust = 0d  ;CS
 
     ; not use spectrum
@@ -792,31 +793,50 @@ for l = ip_b, ip_a -1 do begin ;loop for slit scan
     y_obs = reform(jdat_CO2(l, *, k))
     y_obs = y_obs/specmars_CO2
 
-    y_tmp = multifunction(TA, TB, SZA, EA, PA, dust_opacity, ice_opacity)
+    y_tmp = multifunction(TA, TB, SZA, EA, PA, dust, ice_opacity)
     if y_tmp(0,0) eq 0.0d then goto, skip10
 
-    save, y_tmp, filename='/work1/LUT/Common/fitting_ytmp_albedo_3.sav'
+    save, y_tmp, filename='/work1/LUT/Common/fitting_ytmp_albedo_1.sav'
 
     ;retrieval
-    pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 4)
-    start = [SP, Albedo, 1d, 0d]
+    ;pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 4)
+    ;start = [SP, Albedo, 1d, 0d]
 
     ;W gaussiun fitting
-    ;pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 5)
-    ;start = [SP, Albedo, Result_Fit0(0), Result_Fit0(1), Result_Fit0(2)]
+    pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D], MPPRINT:[0]}, 5)
+    start = [SP, Albedo, Result_Fit0(0), Result_Fit0(1), Result_Fit0(2)]
 
     err = y_obs*1d-3
     err(*) = median(y_obs)*1d-3
 
     ;--- added --->
+    pi(0).limited(*) = 1
+    pi(0).limits(0) = 51
+    pi(0).limits(1) = 1499
+
     pi(1).limited(*) = 1
     pi(1).limits(0) = 0.051
     pi(1).limits(1) = 0.599
-    pi(2).fixed = 1 
+
+    ;simple continuum
+    ;pi(2).fixed = 1 
+
+    ;W gaussiun continuum
+    pi(2:3).fixed = 1 
+
+    ; iteration imformation print ;0はパラメータ表示させない
+    pi(*).MPPRINT = 0
+
     ;<---
 
-    Result_Fit = MPFITFUN('forward', x, y_obs, err, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
+    Result_Fit = MPFITFUN('forward', x, y_obs, err, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, NPRINT=0, yfit=yfit, /nan)
     F = yfit
+
+    ; simple continuum
+    ;cont = poly(findgen(29)-float(29/2), [Result_Fit(2:3)])
+
+    ; WG continuum
+    cont = pyroxenes(x, Result_Fit0(0:2)) / mean(pyroxenes(x, Result_Fit0(0:2)))
 
     f(0:3) = -0d/0d
     f(8) = -0d/0d
@@ -824,6 +844,8 @@ for l = ip_b, ip_a -1 do begin ;loop for slit scan
     f(24) = -0d/0d
     f(27) = -0d/0d
 
+    bestfit(l,k,*) = F
+    continuum(l,k,*) = cont
     pressure(l,k) = Result_Fit(0)
     Albedomap(l,k) = Result_Fit(1)
 
@@ -831,10 +853,21 @@ for l = ip_b, ip_a -1 do begin ;loop for slit scan
     print, "time:", end_time - start_time
     skip10:
 
+    good = where(FINITE(y_obs) eq 1)
+    window,6, xs=800,ys=800
+    plot, x(good), y_obs(good), yr=[-0.1,0.4], back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1
+    ;oplot, x(good), f(good), color=254, thick=2, psym=-1, linestyle=2
+    xyouts, 2.05, -0.08, 'SP='+strcompress(Result_Fit(0)), charsize=2, color=0
+    xyouts, 2.05, -0.06, 'Albedo='+strcompress(Result_Fit(1)), charsize=2, color=0
+    xyouts, 2.05, -0.04, 'Dust='+strcompress(dust), charsize=2, color=0
+
+
+    stop
+
     print, "l LOOP: ", l - ip_b, "/", ip_a - ip_b
     print, "k LOOP: ", k - io_b, "/", io_a - io_b
 
-    save, lati, longi, altitude, pressure, Albedomap, dustmap, TAmap, MCDpressure, filename='/work1/LUT/SP/table/absorption/pressuremap_ORB0920_3_albedo_d0.074.sav'
+    ;save, lati, longi, altitude, pressure, Albedomap, dustmap, TAmap, MCDpressure, bestfit, continuum, filename='/work1/LUT/SP/table/absorption/SPmap_ORB0920_3_albedo_WG.sav'
 
   endfor
 endfor
