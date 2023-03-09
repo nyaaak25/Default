@@ -30,7 +30,7 @@ function forward, x, p
 ;return: radiance
 ;---------------------------
 
-restore, '/work1/LUT/Common/fitting_ytmp_update2.sav'
+restore, '/work1/LUT/Common/fitting_ytmp_11.sav'
 nx = n_elements(x)
 y = dblarr(nx)
 
@@ -120,9 +120,10 @@ loadct, 39
 ; path 
 path = '/data2/omega/sav/'
 path2 = '/work1/LUT/SP/table/absorption/'
+restore, path+'ORB4762_5.sav'
 ;restore, path+'ORB0363_3.sav'
 ;restore, path+'ORB0030_1.sav'
-restore, path+'ORB1201_3.sav'
+;restore, path+'ORB1201_3.sav'
 restore, path + 'specmars.sav'
 
 ;reference spectrum
@@ -142,26 +143,29 @@ free_lun,lun
 ;ind=where_xyz(longi ge 60.79 and longi le 60.81 and lati ge -48.44 and lati le -48.43,xind=xind,yind=yind)
 
 ; ind=37135, xind=15, yind=1160, lati:7.764°S, longi:24.980°E　[Forget+, retrievalすると470 Pa] ORB1201_3
-ind=where_xyz(longi ge 24.979 and longi le 24.981 and lati ge -7.765 and lati le -7.763, xind=xind, yind=yind)
+;ind=where_xyz(longi ge 24.979 and longi le 24.981 and lati ge -7.765 and lati le -7.763, xind=xind, yind=yind)
+
+xind = 38
+yind = 93
 
 ;test getting surface feature 
-x0 = reform(wvl(0:127))
-y0 = reform(jdat(xind,0:127,yind)/specmars(0:127))
-nanserch=where(y0 ge 0 and y0 le 0.0001)
-y0(nanserch)=!VALUES.F_NAN
+;x0 = reform(wvl(0:127))
+;y0 = reform(jdat(xind,0:127,yind)/specmars(0:127))
+;nanserch=where(y0 ge 0 and y0 le 0.0001)
+;y0(nanserch)=!VALUES.F_NAN
 
-ref_Mars = interpol(ref(1,*), ref(0,*), x0, /nan)
-good = where(x0 ge 1.2 and x0 le 2.6 and ref_Mars ge 0.996)
+;ref_Mars = interpol(ref(1,*), ref(0,*), x0, /nan)
+;good = where(x0 ge 1.2 and x0 le 2.6 and ref_Mars ge 0.996)
 
-pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 3)
-start = [0.06, 0.06, median(y0(good))]
-err0 = y0(good)*1d-2
-err0(*) = median(y0(good))*1d-2
-Result_Fit0 = MPFITFUN('pyroxenes', x0(good), y0(good), y0(good)*1d-2, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
-F0 = yfit
+;pi = replicate({step:0d, fixed:0, limited:[0,0], limits:[0.D,0.D]}, 3)
+;start = [0.06, 0.06, median(y0(good))]
+;err0 = y0(good)*1d-2
+;err0(*) = median(y0(good))*1d-2
+;Result_Fit0 = MPFITFUN('pyroxenes', x0(good), y0(good), y0(good)*1d-2, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
+;F0 = yfit
 
-A = FINDGEN(17) * (!PI*2/16.)
-USERSYM, COS(A), SIN(A), /FILL
+;A = FINDGEN(17) * (!PI*2/16.)
+;USERSYM, COS(A), SIN(A), /FILL
 
 ; CO2 absorption emission line
 ; observation spectrum
@@ -172,8 +176,10 @@ specmars = specmars(CO2)
 
 
 ;     ----- MCD ------
-lat = median(lati(xind,yind),/double)
-lon = median(longi(xind,yind),/double)
+;lat = median(lati(xind,yind),/double)
+;lon = median(longi(xind,yind),/double)
+lat = lati(xind,yind)
+lon = longi(xind,yind)
 Ls = SOLAR_LONGITUDE
 Loct = 12. + (lon - SUB_SOLAR_LONGITUDE)/15. ;! TBC!!! !
 dust = 2  ; our best guess MY24 scenario, with solar average conditions
@@ -234,18 +240,39 @@ Albedo = Albedo_input
 dust = dust_opacity
 ;dust = 0d
 
-print, "DUST: " , dust
-
+stop
 ; not use spectrum
 jdat(*,0:3,*)= !VALUES.F_NAN
 jdat(*,8,*)= !VALUES.F_NAN
+jdat(*,11,*)= !VALUES.F_NAN ; new
 jdat(*,17,*)= !VALUES.F_NAN
+jdat(*,19,*)= !VALUES.F_NAN ; new
 jdat(*,24,*)= !VALUES.F_NAN
 jdat(*,27,*)= !VALUES.F_NAN
 
 x = wvl
 y_obs = reform(jdat(xind(0), *, yind(0)))
 y_obs = y_obs/specmars
+
+; ==============
+; system error factor 
+;restore, '/work1/LUT/Common/sys_err_factor.sav'
+;sys_err_factor = sys_err_factor
+
+; create same array
+;factor = dblarr(29)
+;factor(0:3) = -0d/0d
+;factor(4:7) = sys_err_factor(0:3)
+;factor(8) = -0d/0d
+;factor(9:16) = sys_err_factor(4:11)
+;factor(18:23) = sys_err_factor(12:17)
+;factor(24) = -0d/0d
+;factor(25:26) = sys_err_factor(18:19)
+;factor(27) = -0d/0d
+;factor(28) = sys_err_factor(20)
+
+;y_obs = y_obs - factor
+; ==============
 
 y_obs(0:3) = -0d/0d
 y_obs(8) = -0d/0d
@@ -753,7 +780,7 @@ for i = 0, 15-1 do begin
   endfor
 endfor
 
-save, y_tmp, filename='/work1/LUT/Common/fitting_ytmp_update2.sav'
+save, y_tmp, filename='/work1/LUT/Common/fitting_ytmp_11.sav'
 
 
 ;simple continuum fitting
@@ -772,12 +799,16 @@ pi(1).limited(*) = 1
 pi(1).limits(0) = 0.051
 pi(1).limits(1) = 0.599
 pi(2).fixed = 1 
+;pi(2:4).fixed = 1 
 ;<---
 
 Result_Fit = MPFITFUN('forward', x, y_obs, err, start, PARINFO=pi, MAXITER=20, BESTNORM=BESTNORM0, MPSIDE=2, status=status, yfit=yfit, /nan)
 F = yfit
 pressure_value = Result_Fit(0)
 Albedo_value = Result_Fit(1)
+
+;cont = pyroxenes(x, Result_Fit0(0:2)) / mean(pyroxenes(x, Result_Fit0(0:2)))
+cont = poly(findgen(29)-float(29/2), [Result_Fit(2:3)])
 
 end_time = systime(1)
 print, "time:", end_time - start_time
@@ -791,9 +822,19 @@ print, "time:", end_time - start_time
 
 f(0:3) = -0d/0d
 f(8) = -0d/0d
+f(11) = -0d/0d ;new
 f(17) = -0d/0d
+f(19) = -0d/0d ;new
 f(24) = -0d/0d
 f(27) = -0d/0d
+
+cont(0:3) = -0d/0d
+cont(8) = -0d/0d
+cont(11) = -0d/0d ;new
+cont(17) = -0d/0d
+cont(11) = -0d/0d ;new
+cont(24) = -0d/0d
+cont(27) = -0d/0d
 
 ;f2(0:3) = -0d/0d
 ;f2(8) = -0d/0d
@@ -804,15 +845,18 @@ f(27) = -0d/0d
 good = where(FINITE(y_obs) eq 1)
 window,6, xs=800,ys=800
 plot, x(good), y_obs(good), yr=[-0.1,0.4], back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1
+;plot, x(good), cont(good), yr=[-0.1,0.4], back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1
 ;plot, x(good), y_obs(good),yr=[-0.0,0.16], back=255, color=0, thick=3, psym=-1, xr=[1.85, 2.2], xs=1, ys=1
 ;oplot, x(good), f2(good), color=60, thick=3, psym=-1
 oplot, x(good), f(good), color=254, thick=2, psym=-1, linestyle=2
+oplot, x(good), cont(good), color=254, thick=2, psym=-1, linestyle=2
 ;oplot, x(good), 0.05+(y_obs(good)-f(good))*5, color=254, thick=3, psym=-1, linestyle=2
 ;oplot, x(good), (y_obs(good)-f2(good))*5, color=60, thick=2, psym=-1
 ;oplot, x(good), pyroxenes(x(good), Result_Fit(1:3))/(mean(pyroxenes(x(good), Result_Fit(1:3))), color=100
 ;oplot, x(good), poly(findgen(n_elements(good)), Result_Fit(1:2)), color=100
 xyouts, 2.05, -0.08, 'SP='+strcompress(pressure_value), charsize=2, color=0
 xyouts, 2.05, -0.06, 'Albedo='+strcompress(Albedo_value), charsize=2, color=0
+xyouts, 2.05, -0.04, 'Dust='+strcompress(dust), charsize=2, color=0
 stop
 
 
