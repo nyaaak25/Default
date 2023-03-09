@@ -20,7 +20,7 @@ function ret_pressure, trans, TA, TB, SZA, EA, PA, Dust, Waterice, Albedo
   T2 = TB
 
   ;restore
-  restore,'/work1/LUT/SP/table/absorption/density/Table_SP_calc_ver3_LUTupdate.sav'
+  restore,'/work1/LUT/SP/table/absorption/density/Table_SP_calc_ver2_LUTupdate.sav'
 
   ;result
   pressure_CD = -999d
@@ -804,7 +804,7 @@ Pro retrieval_pres_LT_ver2
 
 path = '/data2/omega/sav/'
 path2 = '/work1/LUT/SP/table/absorption/'
-restore, path+'ORB0363_3.sav'
+restore, path+'ORB1201_3.sav'
 restore, path + 'specmars.sav'
 
 ; CO2 absorption emission line   
@@ -818,23 +818,23 @@ specmars = specmars(CO2)
 ;ind=where_xyz(longi ge 60.79 and longi le 60.81 and lati ge -48.44 and lati le -48.43,xind=xind,yind=yind)
 
 ; ind=76094,xind=62, yind=594, lati:22.705700 N , longi:311.76300 E (48.237 W)  [Forget+, retrievalすると852 Pa] ORB0363_3
-ind=where_xyz(longi ge 311.73 and longi le 311.78 and lati ge 22.7 and lati le 22.72,xind=xind,yind=yind)
+;ind=where_xyz(longi ge 311.73 and longi le 311.78 and lati ge 22.7 and lati le 22.72,xind=xind,yind=yind)
 
 ; ind=37135, xind=15, yind=1160, lati:7.764°S, longi:24.980°E　[Forget+, retrievalすると470 Pa] ORB1201_3
-;ind=where_xyz(longi ge 24.979 and longi le 24.981 and lati ge -7.765 and lati le -7.763,xind=xind,yind=yind)
+ind=where_xyz(longi ge 24.979 and longi le 24.981 and lati ge -7.765 and lati le -7.763,xind=xind,yind=yind)
 
 ; ind = 68287, xind=63, yind=533, lati:51.068897 N, longi:276.50281 E, 青木さんの結果を再現 ORB0931_3
 ; ind=where_xyz(longi ge 276.50 and longi le 276.51 and lati ge 51.05 and lati le 51.1,xind=xind,yind=yind)
 ; ind = where_xyz(longi eq 275.82278 and lati eq 52.079899,xind=xind,yind=yind)
 
 ; band幅 ver1 → work_***に格納
-; band=where(wvl gt 1.85 and wvl lt 2.10)
+;band=where(wvl gt 1.85 and wvl lt 2.10)
 
 ; band幅のupdate ver2  → work2_***.sav fileに格納
-; band=where(wvl gt 1.94 and wvl lt 2.09)
+band=where(wvl gt 1.94 and wvl lt 2.09)
 
 ; band幅のupdatte ver3 → work3_***.sav fileに格納
-band=where(wvl gt 1.94 and wvl lt 1.99)
+;band=where(wvl gt 1.94 and wvl lt 1.99)
 
 ; band幅のupdatte ver4 → ver4_***.sav fileに格納
 ;band = where(wvl gt 1.93 and wvl lt 2.04)
@@ -910,11 +910,15 @@ SZA = reform(geocube(xind,8,yind))*1.e-4
 EA = reform(geocube(xind,9,yind))*1.e-4
 PA = reform(geocube(xind,10,yind))*1.e-4
 
-Albedo_input = jdat(xind,0,yind)/specmars(0) / cos(geocube(xind,8,yind)*1e-4*!DTOR)
+; Albedo_input = jdat(xind,0,yind)/specmars(0) / cos(geocube(xind,8,yind)*1e-4*!DTOR)
+Y2 = [jdat(xind,0,yind)/specmars(0), jdat(xind,1,yind)/specmars(1), jdat(xind,2,yind)/specmars(2), jdat(xind,23,yind)/specmars(23), jdat(xind,25,yind)/specmars(25), jdat(xind,26,yind)/specmars(26)]
+coef1 = linfit(X,Y2)
+cont1 = coef1(0) + coef1(1)*wvl
+Albedo_input = (Albedo_input1+Albedo_input0)/2
 
 width = 1.0 - jdat(xind,*,yind)/cont
 trans = total(width[band], /nan)
-dust_opacity = 0.0d
+;dust_opacity = 0.0d
 ice_opacity = 0.0d
 
 pressure = ret_pressure(trans, TA, TB, SZA, EA, PA, dust_opacity, ice_opacity, Albedo_input)
