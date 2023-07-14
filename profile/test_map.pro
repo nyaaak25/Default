@@ -7,9 +7,108 @@ END
 
 
 Pro test_map
-
 device, decomposed = 0, retain = 2
 loadct, 39
+
+; ヒストグラムを2個重ねて表示させる
+minlon = 274
+maxlon = 277
+minlat = 54
+maxlat = 56
+
+; EWのヒストグラムを作成
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/EW_work_ORB0920_3.sav'
+TAMAP1 = TAMAP
+albedomap1 = inputalbedo
+Alt1 = altitude
+lat1 = lati
+lon1 = longi
+p1 = pressure
+p1 = exp(p1)
+
+; *** calc index and create array ***
+; index search
+; 1つ目のORB用
+ip1 = n_elements(lat1(*,0))
+io1 = n_elements(lat1(0,*))
+
+; *** 差し引いたfileのrestore ***
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/mode1_EW_work_920-931.sav'
+p1_mod = p2_mod
+
+; deff p2_mod
+deff = dblarr(ip1, io1)
+deff_1 = p1 - p1_mod
+
+for i = 0, ip1-1 do for j = 0, io1-1 do if p1(i,j) gt 0 and lat1(i,j) gt minlat and lat1(i,j) lt maxlat and lon1(i,j) gt minlon and lon1(i,j) lt maxlon then deff(i,j) = deff_1(i,j)
+for i = 0, ip1-1 do for j = 0, io1-1 do if deff(i,j) eq 0 then deff(i,j) = -0d/0d
+; *** histogram ***
+good = where(abs(deff) ge 0.01)
+med_hist = deff(good)
+
+stop
+
+; fitting
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/SPmap_ORB0920_3_B2_update.sav'
+TAMAP2 = TAMAP
+albedomap2 = inputalbedo
+Alt2 = altitude
+lat2 = lati
+lon2 = longi
+p2 = pressure
+
+; *** 差し引いたfileのrestore ***
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/mode1_fit_work_920-931.sav'
+p_mod = p2_mod
+deff2 = p2 - p_mod
+
+; *** histogram ***
+good = where(abs(deff) ge 0.01)
+med_hist = deff(good)
+
+good2 = where(abs(deff2) ge 0.01)
+med_hist2 = deff2(good2)
+
+loadct, 39
+hist = histogram(med_hist, min=-100, max=100, binsize=1)
+bin = (findgen(n_elements(med_hist))*1) + min(med_hist)
+
+hist2 = histogram(med_hist2, min=-100, max=100, binsize=1)
+bin2 = (findgen(n_elements(med_hist2))*1) + min(med_hist2)
+
+
+window, 2, xs=1200, ys=800
+plot, bin, hist, psym=10, back=255, color=0, xs=1, ys=1, yr=[0,250], xr=[-35,35], thick=3, charsize=2, title='Relative error', xtitle='Pa'
+;plots, bin2, hist2, psym=10, back=255, color=0, xs=1, ys=1, yr=[0,250], xr=[-35,35], thick=3
+
+
+
+
+
+
+
+
+
+
+
+stop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 restore, '/Users/nyonn/IDLWorkspace/Default/savfile/ORB0920_3.sav'
 ind = where_xyz(longi ge 274 and longi le 277 and lati ge 54 and lati le 56, xind=xind, yind=yind)
@@ -27,24 +126,26 @@ Alt2 = reform(geocube(*,12,*))
 SZA2_mod = SZA2
 EA2_mod = EA2
 
-restore, '/Users/nyonn/IDLWorkspace/Default/savfile/SPmap_ORB0920_3_B2_update.sav'
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/EW_work_ORB0920_3.sav'
+;restore, '/Users/nyonn/IDLWorkspace/Default/savfile/SPmap_ORB0920_3_B2_update.sav'
 ;restore, '/Users/nyonn/IDLWorkspace/Default/savfile/SPmap_ORB0920_3_albedo_update.sav'
 lon1 = longi
 lat1 = lati
-p1 = pressure
-albedomap1 = albedomap
+p1 = exp(pressure)
+;albedomap1 = albedomap
 
-restore, '/Users/nyonn/IDLWorkspace/Default/savfile/SPmap_ORB0931_3_B2_update.sav'
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/EW_work_ORB0931_3.sav'
+;restore, '/Users/nyonn/IDLWorkspace/Default/savfile/SPmap_ORB0931_3_B2_update.sav'
 ;restore, '/Users/nyonn/IDLWorkspace/Default/savfile/SPmap_ORB0931_3_albedo_update.sav'
 lat2 = lati
 lon2 = longi
-p2 = pressure
+p2 = exp(pressure)
 p2_mod = p2
 p2_mod(*,*) = -0d/0d
 
-albedomap2 = albedomap
-albedomap2_mod = albedomap
-albedomap2_mod(*,*) = -0d/0d
+;albedomap2 = albedomap
+;albedomap2_mod = albedomap
+;albedomap2_mod(*,*) = -0d/0d
 
 for i = 0, 127 do begin
   for j = 0, 595 do begin
@@ -52,9 +153,9 @@ for i = 0, 127 do begin
     if count ge 1 then begin
       if abs(lat1(i,j)-lat2(xind(0),yind(0))) le 0.03 and abs(lon1(i,j)-lon2(xind(0),yind(0))) le 0.03 then begin
         p2_mod(i,j) = p2(xind(0),yind(0))
-        albedomap2_mod(i,j) = albedomap2(xind(0),yind(0))
-        SZA2_mod(i,j) = SZA2(xind(0),yind(0))
-        EA2_mod(i,j) = EA2(xind(0),yind(0))
+        ;albedomap2_mod(i,j) = albedomap2(xind(0),yind(0))
+        ;SZA2_mod(i,j) = SZA2(xind(0),yind(0))
+        ;EA2_mod(i,j) = EA2(xind(0),yind(0))
       endif
     endif
   endfor

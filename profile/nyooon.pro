@@ -1,12 +1,84 @@
 function gauss, x, myu, sigma
 
-gauss_func = 1/(sigma*sqrt(2*!pi))*exp(-(x-myu)^2/2*sigma^2)
-
-return, gauss_func
+  gauss_func = 1/(sigma*sqrt(2*!pi))*exp(-(x-myu)^2/2*sigma^2)
+  return, gauss_func
 
 end
 
 Pro nyooon
+
+; ヒストグラムを2個重ねて表示させる
+
+; EWのヒストグラムを作成
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/EW_work_ORB0920_3.sav'
+TAMAP1 = TAMAP
+albedomap1 = inputalbedo
+Alt1 = altitude
+lat1 = lati
+lon1 = longi
+p1 = pressure
+p1 = exp(p1)
+
+; *** calc index and create array ***
+; index search
+; 1つ目のORB用
+ip1 = n_elements(lat1(*,0))
+io1 = n_elements(lat1(0,*))
+; 2つ目のORB用
+ip2 = n_elements(lat2(*,0))
+io2 = n_elements(lat2(0,*))
+
+; create array
+p2_mod = dblarr(ip2, io2)
+
+; 範囲を指定
+minlon = 274
+maxlon = 277
+minlat = 54
+maxlat = 56
+
+ind1 = where_xyz(lon1 ge minlon and lon1 le maxlon and lat1 ge minlat and lat1 le maxlat, xind=xind, yind=yind)
+ind2 = where_xyz(lon2 ge minlon and lon2 le maxlon and lat2 ge minlat and lat2 le maxlat, xind=xind, yind=yind)
+
+; *** 差し引いたfileのrestore ***
+restore, '/Users/nyonn/IDLWorkspace/Default/savfile/mode1_EW_work_920-931.sav'
+p2_mod = p2_mod
+deff = p1 - p2_mod
+
+; *** histogram ***
+good = where(abs(deff) lt 100)
+med_hist = deff(good)
+loadct, 39
+hist = histogram(med_hist, min=-100, max=100, binsize=1)
+bin = (findgen(n_elements(med_hist))*1) + min(med_hist)
+plot, bin, hist, psym=10, back=255, color=0, xs=1, ys=1, yr=[0,250], xr=[-35,35], thick=3, charsize=2, title='Histogram: Orb920-Orb931', xtitle='Pa',position=[0.6,0.1,0.95,0.4]
+
+
+
+
+
+
+
+
+
+
+
+stop
+
+; IDLのcolor paletteを作成
+plot, findgen(100),xs=1, ys=1, yr=[0, 2], xr=[0, 256], back=255, color=0, /nodata, charsize=3, title='IDL color palette', xtitle='number'
+
+for i = 0, 255 do begin
+    ;y = dblarr(256)
+    ;y = replicate(1, 256)
+    y = 1
+    loadct,39
+    plots, i, y, color=i, psym=8, symsize=2
+
+endfor
+stop
+
+
 
 pressure = dblarr(3)
 
@@ -568,5 +640,4 @@ print, obs_spec
 ;Write_JPEG, 'test.jpg', snapshot, True=1, Quality=75
 ;
 ;stop
-
 end
